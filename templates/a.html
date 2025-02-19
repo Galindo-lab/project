@@ -1,92 +1,85 @@
 <!DOCTYPE html>
-<!--
- @license
- Copyright 2019 Google LLC. All Rights Reserved.
- SPDX-License-Identifier: Apache-2.0
--->
 <html>
   <head>
     <title>Marker Animations</title>
 
-    <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
-    defer
-  ></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnkzmvIUVIave5wE6vRjcOjme5X8gY3pY&callback=initMap&v=weekly" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <style>
-        /**
-        * @license
-        * Copyright 2019 Google LLC. All Rights Reserved.
-        * SPDX-License-Identifier: Apache-2.0
-        */
-        /* 
-        * Always set the map height explicitly to define the size of the div element
-        * that contains the map. 
-        */
-        #map {
-            height: 100px;
-            width: 100px;
-        }
-
-        /* 
-        * Optional: Makes the sample page fill the window. 
-        */
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+      
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
     </style>
   </head>
-  <body>
+  <body x-data="{ latitud: 32.53205262030344, longitud: -116.96456423568723 }">
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" id="id_latitud" name="latitud" x-model="latitud">
+      <input type="hidden" id="id_longitud" name="longitud" x-model="longitud">
+      <button type="submit" style="display: none;">Guardar</button>
+    </form>
+
     <div id="map"></div>
 
-    <!-- 
-      The `defer` attribute causes the script to execute after the full HTML
-      document has been parsed. For non-blocking uses, avoiding race conditions,
-      and consistent behavior across browsers, consider loading using Promises. See
-      https://developers.google.com/maps/documentation/javascript/load-maps-js-api
-      for more information.
-      -->
-
     <script defer>
-      /**
-       * @license
-       * Copyright 2019 Google LLC. All Rights Reserved.
-       * SPDX-License-Identifier: Apache-2.0
-       */
-      // The following example creates a marker in Stockholm, Sweden using a DROP
-      // animation. Clicking on the marker will toggle the animation between a BOUNCE
-      // animation and no animation.
-      let marker;
-
+      let marker
+      
       function initMap() {
-        const map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 13,
-          center: { lat: 59.325, lng: 18.07 },
-        });
-
+        const map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 17,
+          center: {
+            lat: 32.53205262030344,
+            lng: -116.96456423568723
+          }
+        })
+      
         marker = new google.maps.Marker({
           map,
           draggable: true,
           animation: google.maps.Animation.DROP,
-          position: { lat: 59.327, lng: 18.067 },
-        });
-        marker.addListener("click", toggleBounce);
+          position: {
+            lat: 32.53205262030344,
+            lng: -116.96456423568723
+          }
+        })
+        marker.addListener('click', toggleBounce)
+        marker.addListener('dragend', (event) => {
+          const latLng = event.latLng
+          Alpine.$data(document.body).latitud = latLng.lat()
+          Alpine.$data(document.body).longitud = latLng.lng()
+        })
       }
-
-      function toggleBounce() {
+      
+      function toggleBounce(a) {
         if (marker.getAnimation() !== null) {
-          marker.setAnimation(null);
+          marker.setAnimation(null)
         } else {
-          marker.setAnimation(google.maps.Animation.BOUNCE);
+
+          const latLng = a.latLng
+          Alpine.$data(document.body).latitud = latLng.lat()
+          Alpine.$data(document.body).longitud = latLng.lng()
+
+          // Mostrar alerta para confirmar la ubicación
+          const confirmacion = confirm("¿Confirmas esta ubicación? Lat: " + latLng.lat() + ", Lng: " + latLng.lng());
+          
+          if (confirmacion) {
+            // Si el usuario acepta, hacer submit en el formulario
+            document.querySelector('form').submit();
+          }
         }
       }
-
-      window.initMap = initMap;
+      
+      window.initMap = initMap
     </script>
   </body>
 </html>
