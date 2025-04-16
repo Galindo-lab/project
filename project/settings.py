@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'core'
+    'core',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -119,7 +121,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -137,3 +143,85 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'https://maps.googleapis.com/'
 ]
+
+
+# Configuración de PWA
+PWA_APP_NAME = 'Mi PWA'
+PWA_APP_DESCRIPTION = "Mi aplicación PWA con Django"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+
+PWA_APP_ICONS = [
+    {
+        "purpose": "maskable",
+        "sizes": "512x512",
+        "src": "static/icon/maskable_icon_x512.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "48x48",
+        "src": "static/icon/maskable_icon_x48.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "72x72",
+        "src": "static/icon/maskable_icon_x72.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "96x96",
+        "src": "static/icon/maskable_icon_x96.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "128x128",
+        "src": "static/icon/maskable_icon_x128.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "192x192",
+        "src": "static/icon/maskable_icon_x192.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "384x384",
+        "src": "static/icon/maskable_icon_x384.png",
+        "type": "image/png",
+    },
+    {
+        "purpose": "maskable",
+        "sizes": "512x512",
+        "src": "static/icon/maskable_icon_x512.png",
+        "type": "image/png",
+    },
+]
+
+PWA_APP_ICONS_APPLE = [
+    {
+        "purpose": "maskable",
+        "sizes": "512x512",
+        "src": "static/icon/maskable_icon_x512.png",
+        "type": "image/png",
+    }
+]
+
+PWA_APP_SPLASH_SCREEN = [
+    {
+        "src": "static/img.jpg",
+        "media": "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
+    }
+]
+
+
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')

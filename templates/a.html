@@ -3,8 +3,12 @@
   <head>
     <title>Marker Animations</title>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnkzmvIUVIave5wE6vRjcOjme5X8gY3pY&callback=initMap&v=weekly" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
       #map {
@@ -20,7 +24,7 @@
       }
     </style>
   </head>
-  <body x-data="{ latitud: 32.53205262030344, longitud: -116.96456423568723 }">
+  <body x-data="{ latitud: 32.53205262030344, longitud: -116.96456423568723, isModalActive: false }">
 
     <form method="post">
       {% csrf_token %}
@@ -30,6 +34,24 @@
     </form>
 
     <div id="map"></div>
+
+    <!-- Modal -->
+    <div class="modal" :class="{ 'is-active': isModalActive }">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Confirmar Ubicación</p>
+          <button class="delete" aria-label="close" @click="isModalActive = false"></button>
+        </header>
+        <section class="modal-card-body">
+          ¿Confirmas esta ubicación? Lat: <span x-text="latitud"></span>, Lng: <span x-text="longitud"></span>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-success" @click="confirmLocation">Confirmar</button>
+          <button class="button" @click="isModalActive = false">Cancelar</button>
+        </footer>
+      </div>
+    </div>
 
     <script defer>
       let marker
@@ -64,19 +86,18 @@
         if (marker.getAnimation() !== null) {
           marker.setAnimation(null)
         } else {
-
           const latLng = a.latLng
           Alpine.$data(document.body).latitud = latLng.lat()
           Alpine.$data(document.body).longitud = latLng.lng()
 
-          // Mostrar alerta para confirmar la ubicación
-          const confirmacion = confirm("¿Confirmas esta ubicación? Lat: " + latLng.lat() + ", Lng: " + latLng.lng());
-          
-          if (confirmacion) {
-            // Si el usuario acepta, hacer submit en el formulario
-            document.querySelector('form').submit();
-          }
+          // Mostrar el modal en lugar de un alert
+          Alpine.$data(document.body).isModalActive = true
         }
+      }
+
+      function confirmLocation() {
+        // Si el usuario acepta, hacer submit en el formulario
+        document.querySelector('form').submit();
       }
       
       window.initMap = initMap

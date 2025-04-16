@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geolocalización en Segundo Plano</title>
+  <link rel="manifest" href="{% url 'pwa:manifest' %}">
+</head>
+<body>
+  <h1>Geolocalización en Segundo Plano</h1>
+  <p id="location">Obteniendo ubicación...</p>
+
+  <script>
+    // Registrar el Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('{% static "js/serviceworker.js" %}')
+        .then((registration) => {
+          console.log('Service Worker registrado:', registration);
+        })
+        .catch((error) => {
+          console.error('Error al registrar el Service Worker:', error);
+        });
+    }
+
+    // Solicitar permisos de geolocalización
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          document.getElementById('location').innerText = `Latitud: ${latitude}, Longitud: ${longitude}`;
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación:', error);
+        }
+      );
+    } else {
+      document.getElementById('location').innerText = 'Geolocalización no soportada en este navegador.';
+    }
+  </script>
+</body>
+</html>
