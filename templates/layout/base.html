@@ -7,6 +7,13 @@
 <body class="bg-body-tertiary">
     {% block content %}
 
+    <button type="submit" class="dropdown-item py-2" form="logoutForm">
+        {% include 'layout/shared/LogoutForm.html' with id='logoutForm' %}
+
+        <i class="bi bi-box-arrow-right me-2"></i>
+        <span>Cerrar Sesión</span>
+    </button>
+
     {% endblock content %}
 </body>
 </html>
