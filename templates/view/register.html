@@ -16,7 +16,6 @@
     
         x-data="{
     step: 1,
-    isTransitioning: false,
     formValues: {
         email: '{{ form.email.value|default:'' }}',
         username: '{{ form.username.value|default:'' }}',
@@ -25,9 +24,7 @@
     },
     changeStep(newStep) {
         if (newStep === 2 && (!this.formValues.email || !this.formValues.username)) return;
-        this.isTransitioning = true;
         this.step = newStep;
-        setTimeout(() => { this.isTransitioning = false; }, 300);
     },
     isStep1Valid() {
         return this.formValues.email.trim() && this.formValues.username.trim();
@@ -62,29 +59,9 @@
                     </div>
                 </div>
 
-                <div style="height: 21px;">
-
-                {% if form.non_field_errors %}
-
-                <div class="alert alert-danger small mb-3"  >
-                    {% for error in form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-                </div>
-
-
-                <div class="" style="">
+                <div class="">
                     <!-- Paso 1 -->
-                    <div x-show="step === 1" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 transform translate-x-20"
-                         x-transition:enter-end="opacity-100 transform translate-x-0"
-                         x-transition:leave="transition ease-in duration-300"
-                         x-transition:leave-start="opacity-100 transform translate-x-0"
-                         x-transition:leave-end="opacity-0 transform -translate-x-20"
-                         class="w-100">
+                    <div x-show="step === 1" class="w-100">
                         <div class="form-floating mb-3">
                             <input type="email" 
                                    name="email" 
@@ -121,22 +98,14 @@
                             <button type="button" 
                                     @click="changeStep(2)" 
                                     class="btn btn-primary"
-                                    :disabled="!isStep1Valid() || isTransitioning">
+                                    :disabled="!isStep1Valid()">
                                 Siguiente
                             </button>
                         </div>
                     </div>
 
                     <!-- Paso 2 -->
-                    <div x-show="step === 2" 
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 transform translate-x-20"
-                         x-transition:enter-end="opacity-100 transform translate-x-0"
-                         x-transition:leave="transition ease-in duration-300"
-                         x-transition:leave-start="opacity-100 transform translate-x-0"
-                         x-transition:leave-end="opacity-0 transform translate-x-20"
-                         class=" w-100">
-                        
+                    <div x-show="step === 2" class="w-100">
                         <div class="form-floating mb-3">
                             <input type="password"
                                    name="password1"
@@ -174,18 +143,17 @@
                         </div>
                     </div>
                 </div>
-                
-
             </form>
         </div>
 
         <div class="card-footer bg-transparent border-0">
-            <!-- Enlace "¿Ya tienes una cuenta?" fuera del área de pasos -->
             <div class="text-center">
-                ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+                <div>
+                    ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+                </div>
+                <a href="" class="mt-2 w-100 text-center small text-muted text-decoration-none">Olvidé mi Contraseña</a>
             </div>
         </div>
-
     </div>
 </div>
 
