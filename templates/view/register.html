@@ -14,22 +14,22 @@
     justify-content: center;
     align-items: center;" 
     
-        x-data="{
-    step: 1,
-    formValues: {
-        email: '{{ form.email.value|default:'' }}',
-        username: '{{ form.username.value|default:'' }}',
-        password1: '',
-        password2: ''
-    },
-    changeStep(newStep) {
-        if (newStep === 2 && (!this.formValues.email || !this.formValues.username)) return;
-        this.step = newStep;
-    },
-    isStep1Valid() {
-        return this.formValues.email.trim() && this.formValues.username.trim();
-    }
-}">
+    x-data="{
+        step: 1,
+        formValues: {
+            email: '{{ form.email.value|default:'' }}',
+            username: '{{ form.username.value|default:'' }}',
+            password1: '',
+            password2: ''
+        },
+        changeStep(newStep) {
+            if (newStep === 2 && (!this.formValues.email || !this.formValues.username)) return;
+            this.step = newStep;
+        },
+        isStep1Valid() {
+            return this.formValues.email.trim() && this.formValues.username.trim();
+        }
+    }">
     <div class="card border-0 bg-transparent" style="max-width: 400px; width: 100%;">
         <div class="card-body">
             <form method="post" novalidate>
@@ -97,7 +97,7 @@
                         <div class="d-grid gap-2">
                             <button type="button" 
                                     @click="changeStep(2)" 
-                                    class="btn btn-primary"
+                                    class="btn btn-primary mt-3"
                                     :disabled="!isStep1Valid()">
                                 Siguiente
                             </button>
@@ -139,7 +139,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                            <button type="submit" class="btn btn-primary mt-3">Registrarse</button>
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                 <div>
                     ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
                 </div>
-                <a href="" class="mt-2 w-100 text-center small text-muted text-decoration-none">Olvidé mi Contraseña</a>
+                <a href="{% url 'reset_password' %}" class="mt-2 w-100 text-center small text-muted text-decoration-none">Olvidé mi Contraseña</a>
             </div>
         </div>
     </div>

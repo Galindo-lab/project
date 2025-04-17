@@ -1,0 +1,30 @@
+{% extends 'layout/base.html' %}
+{% block title %}Contraseña Actualizada{% endblock title %}
+
+{% block content %}
+<div class="modal-overlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+">
+    <div class="card border-0 bg-transparent" style="max-width: 400px; width: 100%;">
+        <div class="card-body text-center">
+            <div class="mb-4">
+                <h2><i class="bi bi-check-circle fs-1 text-success"></i></h2>
+                <h3>¡Contraseña actualizada!</h3>
+            </div>
+            
+            <p class="mb-4">Tu contraseña ha sido cambiada exitosamente.</p>
+            
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn btn-success">Iniciar sesión</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
