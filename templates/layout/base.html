@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     {% include 'layout/shared/Imports.html' %}
     <title>{% block title %}Sin Titulo{% endblock title %}</title>
 </head>
-<body class="bg-body-tertiary">
+<body>
     {% block content %}
 
+
+    {% endblock content %}
+</body>
+</html>
+
+{% comment "" %}
     <button type="submit" class="dropdown-item py-2" form="logoutForm">
         {% include 'layout/shared/LogoutForm.html' with id='logoutForm' %}
 
         <i class="bi bi-box-arrow-right me-2"></i>
         <span>Cerrar Sesión</span>
     </button>
-
-    {% endblock content %}
-</body>
-</html>
+{% endcomment %}

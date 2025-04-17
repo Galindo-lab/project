@@ -11,6 +11,6 @@ def index(request):
     """
     Render the index page.
     """
-    return render(request, 'layout/base.html')
+    return render(request, 'layout/app.html')
 
 
