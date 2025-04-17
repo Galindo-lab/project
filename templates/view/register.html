@@ -75,7 +75,7 @@
                 </div>
 
 
-                <div class="position-relative" style="min-height: 220px;">
+                <div class="" style="">
                     <!-- Paso 1 -->
                     <div x-show="step === 1" 
                          x-transition:enter="transition ease-out duration-300"
@@ -84,7 +84,7 @@
                          x-transition:leave="transition ease-in duration-300"
                          x-transition:leave-start="opacity-100 transform translate-x-0"
                          x-transition:leave-end="opacity-0 transform -translate-x-20"
-                         class="position-absolute w-100">
+                         class="w-100">
                         <div class="form-floating mb-3">
                             <input type="email" 
                                    name="email" 
@@ -135,7 +135,7 @@
                          x-transition:leave="transition ease-in duration-300"
                          x-transition:leave-start="opacity-100 transform translate-x-0"
                          x-transition:leave-end="opacity-0 transform translate-x-20"
-                         class="position-absolute w-100">
+                         class=" w-100">
                         
                         <div class="form-floating mb-3">
                             <input type="password"
@@ -175,12 +175,17 @@
                     </div>
                 </div>
                 
-                <!-- Enlace "¿Ya tienes una cuenta?" fuera del área de pasos -->
-                <div class="text-center">
-                    ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
-                </div>
+
             </form>
         </div>
+
+        <div class="card-footer bg-transparent border-0">
+            <!-- Enlace "¿Ya tienes una cuenta?" fuera del área de pasos -->
+            <div class="text-center">
+                ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+            </div>
+        </div>
+
     </div>
 </div>
 
