@@ -1,0 +1,219 @@
+{% extends 'layout/base.html' %}
+{% block title %}Registro{% endblock title %}
+
+{% load static %}
+
+{% block content %}
+<div class="modal-overlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+" x-data="{
+    step: 1,
+    showPassword: false,
+    isTransitioning: false,
+    formValues: {
+        email: '{{ form.email.value|default:'' }}',
+        username: '{{ form.username.value|default:'' }}',
+        password1: '',
+        password2: ''
+    },
+    changeStep(newStep) {
+        if (newStep === 2 && (!this.formValues.email || !this.formValues.username)) return;
+        this.isTransitioning = true;
+        this.step = newStep;
+        setTimeout(() => { this.isTransitioning = false; }, 300);
+    },
+    isStep1Valid() {
+        return this.formValues.email.trim() && this.formValues.username.trim();
+    }
+}">
+    <div class="card border-0 bg-transparent" style="max-width: 400px; width: 100%;">
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-4 text-center">
+                    <h2><i class="bi bi-layout-wtf me-2"></i>ProjectWise</h2>
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="button" 
+                                @click="changeStep(1)" 
+                                class="step-indicator-btn bg-transparent border-0 p-0"
+                                :class="{'active': step === 1}">
+                            <div class="step-indicator" :class="{'bg-primary text-white': step === 1}">1</div>
+                        </button>
+                        <div class="step-divider"></div>
+                        <button type="button" 
+                                @click="changeStep(2)" 
+                                class="step-indicator-btn bg-transparent border-0 p-0"
+                                :disabled="!isStep1Valid()"
+                                :class="{'active': step === 2}">
+                            <div class="step-indicator" :class="{'bg-primary text-white': step === 2}">2</div>
+                        </button>
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger small mb-3">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="position-relative" style="min-height: 300px;">
+                    <!-- Paso 1 -->
+                    <div x-show="step === 1" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 transform translate-x-20"
+                         x-transition:enter-end="opacity-100 transform translate-x-0"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-x-0"
+                         x-transition:leave-end="opacity-0 transform -translate-x-20"
+                         class="position-absolute w-100">
+                        <div class="form-floating mb-3">
+                            <input type="email" 
+                                   name="email" 
+                                   class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                   id="emailInput" 
+                                   placeholder="Email" 
+                                   required
+                                   x-model="formValues.email">
+                            <label for="emailInput">Email</label>
+                            {% for error in form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="text" 
+                                   name="username" 
+                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   id="usernameInput" 
+                                   placeholder="Usuario" 
+                                   required
+                                   x-model="formValues.username">
+                            <label for="usernameInput">Usuario</label>
+                            {% for error in form.username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="button" 
+                                    @click="changeStep(2)" 
+                                    class="btn btn-primary"
+                                    :disabled="!isStep1Valid() || isTransitioning">
+                                Siguiente
+                            </button>
+                            <div class="text-center mt-2">
+                                ¿Ya tienes una cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div x-show="step === 2" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 transform translate-x-20"
+                         x-transition:enter-end="opacity-100 transform translate-x-0"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 transform translate-x-0"
+                         x-transition:leave-end="opacity-0 transform translate-x-20"
+                         class="position-absolute w-100">
+                        
+
+                        <div class="form-floating mb-3">
+                            <input :type="showPassword ? 'text' : 'password'"
+                                   name="password1"
+                                   class="form-control {% if form.password1.errors %}is-invalid{% endif %}" 
+                                   id="password1Input" 
+                                   placeholder="Contraseña" 
+                                   required
+                                   x-model="formValues.password1">
+                            <label for="password1Input">Contraseña</label>
+                            {% for error in form.password1.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input :type="showPassword ? 'text' : 'password'"
+                                   name="password2"
+                                   class="form-control {% if form.password2.errors %}is-invalid{% endif %}" 
+                                   id="password2Input" 
+                                   placeholder="Confirmar Contraseña" 
+                                   required
+                                   x-model="formValues.password2">
+                            <label for="password2Input">Confirmar Contraseña</label>
+                            {% for error in form.password2.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-check mb-4 ms-2">
+                            <input type="checkbox" 
+                                   id="showPasswordCheckbox" 
+                                   class="form-check-input" 
+                                   x-model="showPassword">
+                            <label class="form-check-label" for="showPasswordCheckbox">Mostrar Contraseña</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .step-indicator {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    .step-indicator.bg-primary {
+        background-color: #0d6efd !important;
+        color: white !important;
+    }
+    .step-divider {
+        width: 40px;
+        height: 2px;
+        background-color: #e9ecef;
+        margin: 0 5px;
+        align-self: center;
+    }
+    .step-indicator-btn:disabled .step-indicator {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .step-indicator-btn:not(:disabled):hover .step-indicator:not(.bg-primary) {
+        transform: scale(1.1);
+        background-color: #dee2e6;
+    }
+    [x-cloak] { display: none !important; }
+</style>
+{% endblock content %}
