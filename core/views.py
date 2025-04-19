@@ -13,7 +13,7 @@ def index(request):
     """
     Render the index page.
     """
-    return render(request, 'layout/app.html')
+    return render(request, 'layout/app/main.html')
 
 from django.shortcuts import render, redirect
 

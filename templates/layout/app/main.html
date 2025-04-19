@@ -1,0 +1,176 @@
+{% extends 'layout/base.html' %}
+{% block title %}
+  test
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+  <div class="d-flex justify-content-start">
+    {# sidebar #}
+    <div class="bg-body m-auto flex-column d-none d-lg-flex" style="min-width: 248px; max-width: 216px; height: 100dvh;">
+      <div style="width: 168px; height: 40px;" class="m-3 mb-2">
+        <h4 class="text-center"><i class="bi bi-layout-wtf me-2"></i>ProjectWise</h4>
+      </div>
+
+      <div class="p-3 pb-2 flex-grow-1 d-flex flex-column">
+        <div>
+          {# cta #}
+          <button class="btn btn-lg btn-primary w-100 mt-3"><i class="bi bi-plus me-2"></i>Nueva meta</button>
+
+          {# filtros #}
+          <div class="list-group list-group-flush mt-5">
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              A third link item
+              <i class="bi bi-check-circle"></i>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">A fourth link item</a>
+            <a class="list-group-item list-group-item-action">A disabled link item</a>
+          </div>
+        </div>
+
+        <div class="mt-auto pt-3">
+          <div class="dropdown">
+            {# perfil de usuario #}
+            <button class="btn btn-outline-secondary border-0 w-100 text-start" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="bg-primary text-white small rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">AB</div>
+              <span class="small ms-1">My User</span>
+            </button>
+
+            {# acciones #}
+            <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="userDropdown">
+              <li>
+                <a class="dropdown-item" href="#">Perfil</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">Cerrar sesión</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# cuerpo #}
+    <div class="d-flex flex-column bg-body-tertiary" style="width: 100%; height: 100dvh;">
+      {# top nav #}
+      <nav class="navbar navbar-expand-lg bg-body">
+        <div class="container-fluid">
+          {# Nombres y tabs #}
+          <a class="navbar-brand text-body" href="#">
+            <div class="d-none d-lg-flex">Proyecto dadsafewfewfew</div>
+            <div class="d-flex d-lg-none">
+              <i class="bi bi-layout-wtf me-2"></i>ProjectWise
+            </div>
+          </a>
+
+          <div class="collapse navbar-collapse ms-3">
+            <ul class="nav nav-underline d-none d-lg-flex">
+              <li class="nav-item">
+                <a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a>
+              </li>
+            </ul>
+          </div>
+
+          {# boton de buscar #}
+          <form class="d-flex" role="search">
+            <button class="btn btn-outline-secondary border-0" type="submit"><i class="bi bi-search"></i></button>
+          </form>
+        </div>
+      </nav>
+
+      <div class="overflow-auto" style="height: 100dvh;">
+        {# body #}
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col" class="">#</th>
+              <th scope="col" class="">Título</th>
+              <th scope="col" class="">Recurso</th>
+              <th scope="col" class="">Duración</th>
+              <th scope="col" class="">Estado</th>
+              <th scope="col" class="">Progreso</th>
+              <th scope="col" class="">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Introducción a HTML</td>
+              <td>Video</td>
+              <td>30 min</td>
+              <td>Completado</td>
+              <td>100%</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary">Editar</button>
+                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Fundamentos de CSS</td>
+              <td>Documento PDF</td>
+              <td>45 min</td>
+              <td>En progreso</td>
+              <td>75%</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary">Editar</button>
+                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>JavaScript Básico</td>
+              <td>Curso interactivo</td>
+              <td>2 horas</td>
+              <td>Pendiente</td>
+              <td>0%</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary">Editar</button>
+                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+          {% for i in 'x'|rjust:'100' %}
+            <div class="card mb-2 border-1">
+              <div class="card-header">Elemento {{ forloop.counter }}</div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">An item</li>
+                <li class="list-group-item">A second item</li>
+                <li class="list-group-item">A third item</li>
+              </ul>
+            </div>
+          {% endfor %}
+      </div>
+
+      {# bottom nav #}
+      <div class="bg-body d-block d-lg-none">
+        <ul class="icon-bottom nav nav-tabs nav-justified" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link">Movies <i class="bi bi-film"></i></button>
+          </li>
+
+          <li class="nav-item" role="presentation">
+            <button class="nav-link">Movies <i class="bi bi-film"></i></button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active">Music <i class="bi bi-music-note-beamed"></i></button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link">Pictures <i class="bi bi-image"></i></button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}
