@@ -1,0 +1,23 @@
+<div class="dropdown">
+  {# perfil de usuario #}
+  <button class="btn btn-outline-secondary border-0 w-100 text-start" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="bg-primary text-white small rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">AB</div>
+    <span class="small ms-1">My User</span>
+  </button>
+
+  {# acciones #}
+  <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="userDropdown">
+    <li>
+      <a class="dropdown-item" href="#"><i class="bi bi-person-fill me-2"></i>Perfil</a>
+    </li>
+    <li>
+      <hr class="dropdown-divider" />
+    </li>
+    <li>
+      <button type="submit" class="dropdown-item" form="logoutForm">
+        {% include 'layout/shared/LogoutForm.html' with id='logoutForm' %}
+        <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+      </button>
+    </li>
+  </ul>
+</div>

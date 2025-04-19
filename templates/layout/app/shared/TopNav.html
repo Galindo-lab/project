@@ -1,0 +1,44 @@
+<div x-data="{ showSearch: false }" style="height: 58px;">
+    {# Barra de navegación principal #}
+    <nav :class="{'d-none': showSearch}" class="navbar navbar-expand-lg bg-body">
+        <div class="container-fluid">
+            {# Nombres y tabs #}
+            <a class="navbar-brand text-body fs-4" href="#">
+                <div class="d-none d-lg-flex">Proyecto dadsafewfewfew</div>
+                <div class="d-flex d-lg-none">
+                <i class="bi bi-layout-wtf me-2"></i>ProjectWise
+                </div>
+            </a>
+
+            <div class="collapse navbar-collapse ms-3">
+                <ul class="nav nav-underline d-none d-lg-flex">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a>
+                </li>
+                </ul>
+            </div>
+
+            {# boton de buscar #}
+            <form class="d-flex" role="search">
+                <button @click.prevent="showSearch = true" class="btn btn-outline-secondary border-0" type="button">
+                <i class="bi bi-search "></i>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    {# Barra de busqueda #}
+    <div :class="{'d-none': !showSearch}" class="navbar navbar-expand-lg bg-body d-none">
+        <div class="container-fluid" style="height: 42px;">
+            <form class="d-flex w-100" role="search" >
+                <button @click.prevent="showSearch = false" class="btn btn-outline-secondary border-0 me-2" type="button">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <input class="form-control border-0 bg-dark-subtle" type="search" placeholder="Buscar..." aria-label="Search" autofocus>
+            </form>
+        </div>
+    </div>
+</div>
