@@ -1,21 +1,18 @@
 import json
 
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView
-from django.views.generic.edit import CreateView
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 from core.forms import RegisterForm
 
+@login_required
 def index(request):
     """
     Render the index page.
     """
     return render(request, 'layout/app/main.html')
 
-from django.shortcuts import render, redirect
 
 def register(request):
     if request.method == 'POST':

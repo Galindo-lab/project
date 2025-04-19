@@ -10,7 +10,7 @@ from core.views import index
 from core.views import register
 
 urlpatterns = [
-    path("", index, name="home"),
+    path("home/", index, name="home"),
     
     # Login
     path('login/', auth_views.LoginView.as_view(template_name='view/login.html'), name='login'),
