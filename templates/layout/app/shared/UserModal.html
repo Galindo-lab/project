@@ -1,0 +1,35 @@
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userModalLabel">Perfil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Información del usuario desde Django -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="fw-bold">Usuario</span>
+          <span>{{ request.user.username }}</span>
+        </div>
+      
+        <div class="d-flex justify-content-between align-items-center my-3">
+          <span class="fw-bold">Correo</span>
+          <span>{{ request.user.email }}</span>
+        </div>
+      
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="fw-bold">Plan</span>
+          <span>{{ request.user.profile.plan }}</span>
+        </div>
+      
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="fw-bold">Terminal sesión actual</span>
+          <button type="submit" class="btn btn-sml btn-outline-secondary" form="logoutForm">
+            {% include 'layout/shared/LogoutForm.html' with id='logoutForm' %}Cerrar sesión
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
