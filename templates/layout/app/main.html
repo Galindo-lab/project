@@ -45,40 +45,42 @@
       {% include 'layout/app/shared/TopNav.html' %}
 
       {# autoscroll #}
-      <div class="overflow-auto border border-secondary-subtle rounded mt-1 me-0 mb-0 me-lg-1 mb-lg-1" style="height: 100dvh;">
+      <div class="overflow-auto p-1" style="height: 100dvh;">
         {# body #}
-        <div class="">
-          <table class="table table-striped table-borderless mb-0">
-            <thead>
-              <tr>
-                <th scope="col">
-                  <input type="checkbox" id="select-all" />
-                </th>
-                <th scope="col">#</th>
-                <th scope="col">Título</th>
-                <th scope="col">Recurso</th>
-                <th scope="col">Duración</th>
-                <th scope="col">Estado</th>
-                <th scope="col">Progreso</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for i in 'x'|rjust:'100' %}
+
+        {% block main %}
+
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless mb-0">
+              <thead>
                 <tr>
-                  <td>
-                    <input type="checkbox" name="item-select" value="{{ forloop.counter }}" />
-                  </td>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>Título del elemento</td>
-                  <td>Video</td>
-                  <td>30 min</td>
-                  <td>Pendiente</td>
-                  <td>0%</td>
+                  <th scope="col" class="col-auto">
+                    <input type="checkbox" id="select-all" class="form-check-input">
+                  </th>
+                  <th scope="col" class="col-auto text-nowrap">#</th>
+                  <th scope="col" class="w-100">Título</th>
+                  <th scope="col" class="col-auto text-nowrap">Estado</th>
+                  <th scope="col" class="col-auto text-nowrap">Progreso</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {% for i in 'x'|rjust:'100' %}
+                  <tr>
+                    <td class="col-auto">
+                      <input type="checkbox" name="item-select" value="{{ forloop.counter }}" class="form-check-input">
+                    </td>
+                    <th scope="row" class="col-auto">{{ forloop.counter }}</th>
+                    <td class="w-100">Título del elemento {{ forloop.counter }}</td>
+                    <td class="col-auto text-nowrap">Pendiente</td>
+                    <td class="col-auto text-nowrap">0%</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        {% endblock main %}
+
       </div>
 
       {# bottom nav #}
