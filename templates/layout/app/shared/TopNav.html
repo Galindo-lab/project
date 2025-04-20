@@ -3,16 +3,16 @@
     <nav :class="{'d-none': showSearch}" class="navbar navbar-expand-lg bg-body">
         <div class="container-fluid ps-0">
             {# Nombres y tabs #}
-            <a class="navbar-brand text-body fs-4" href="#">
+            <a class="text-body text-decoration-none fs-5 ms-3 ms-lg-0" href="#">
                 <div class="d-none d-lg-flex">Proyecto dadsafewfewfew</div>
                 <div class="d-flex d-lg-none">
-                <i class="bi bi-layout-wtf me-2"></i>ProjectWise
+                <i class="bi bi-layout-wtf me-2 fw-bold"></i>ProjectWise
                 </div>
             </a>
 
             {# boton de buscar #}
             <form class="d-flex" role="search">
-                <button @click.prevent="showSearch = true" class="btn btn-outline-secondary border-0" type="button">
+                <button @click.prevent="showSearch = true" class="btn btn-outline-secondary " type="button">
                 <i class="bi bi-search "></i>
                 </button>
             </form>
@@ -21,9 +21,9 @@
 
     {# Barra de busqueda #}
     <div :class="{'d-none': !showSearch}" class="navbar navbar-expand-lg bg-body d-none">
-        <div class="container-fluid ps-0" style="height: 42px;">
+        <div class="container-fluid ps-0" >
             <form class="d-flex w-100" role="search" >
-                <button @click.prevent="showSearch = false" class="btn btn-outline-secondary border-0 me-1" type="button">
+                <button @click.prevent="showSearch = false" class="btn btn-outline-secondary border-0 mx-1" type="button">
                     <i class="bi bi-chevron-left"></i>
                 </button>
                 
