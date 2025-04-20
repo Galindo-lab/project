@@ -45,12 +45,23 @@
       {# top nav #}
       {% include 'layout/app/shared/TopNav.html' %}
 
+      <ul class="nav nav-underline d-none d-lg-flex">
+        <li class="nav-item">
+          <a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a>
+        </li>
+      </ul>
+
+
       {# autoscroll #}
       <div class="overflow-auto p-1" style="height: 100dvh;">
         {# body #}
         {% block main %}
+
           <div class="table-responsive">
-            <table class="table table-hover table-borderless mb-0">
+            <table class="table table-hover mb-0">
               <thead>
                 <tr>
                   <th scope="col" class="col-auto">
