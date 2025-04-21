@@ -2,25 +2,28 @@
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
-<head>
+  <head>
     <script src="{% static 'script/theme.js' %}"></script>
 
     {% include 'layout/shared/Imports.html' %}
-    <title>{% block title %}Sin Titulo{% endblock title %}</title>
-</head>
-<body>
+    <title>
+      {% block title %}
+        Sin Titulo
+      {% endblock %}
+    </title>
+  </head>
+  <body>
     {% block content %}
 
-
-    {% endblock content %}
-</body>
+    {% endblock %}
+  </body>
 </html>
 
-{% comment "" %}
-    <button type="submit" class="dropdown-item py-2" form="logoutForm">
-        {% include 'layout/shared/LogoutForm.html' with id='logoutForm' %}
+{% comment '' %}
+<button type="submit" class="dropdown-item py-2" form="logoutForm">
+  {% include 'layout/shared/LogoutForm.html' with id='logoutForm' %}
 
-        <i class="bi bi-box-arrow-right me-2"></i>
-        <span>Cerrar Sesión</span>
-    </button>
+  <i class="bi bi-box-arrow-right me-2"></i>
+  <span>Cerrar Sesión</span>
+</button>
 {% endcomment %}

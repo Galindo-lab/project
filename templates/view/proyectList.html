@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block modals %}
-  <!-- Modal -->
-  <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -17,13 +17,13 @@
         <form method="post" action="{% url 'project_create' %}">
           <div class="modal-body">
             {% csrf_token %}
-            <div class="mb-3">
-              <label for="projectName" class="form-label">Nombre del Proyecto</label>
-              <input type="text" class="form-control" id="projectName" name="name" required maxlength="100" />
+            <div class="form-floating form-floating-outlined mb-3">
+              <input type="text" class="form-control" id="projectName" name="name" placeholder=" " required maxlength="100" />
+              <label for="projectName">Nombre del Proyecto</label>
             </div>
-            <div class="mb-3">
-              <label for="projectDescription" class="form-label">Descripción</label>
-              <textarea class="form-control" id="projectDescription" name="description" rows="3"></textarea>
+            <div class="form-floating form-floating-outlined mb-3">
+              <textarea class="form-control" id="projectDescription" name="description" placeholder=" " style="height: 100px; min-height: 100px;"></textarea>
+              <label for="projectDescription">Descripción</label>
             </div>
           </div>
           <div class="modal-footer">
@@ -38,17 +38,7 @@
 
 {% block main %}
   {% include 'layout/app/shared/TopNav.html' with title='Mis Proyectos' %}
-
-  {% if messages %}
-    <div class="pt-0 my-1">
-      {% for message in messages %}
-        <div class="alert mb-0 alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} m-0 alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+  {% include 'layout/app/shared/Messages.html' %}
 
   {# autoscroll #}
   <div class="overflow-auto p-2" style="height: 100dvh;">
