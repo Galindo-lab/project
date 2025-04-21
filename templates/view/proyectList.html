@@ -1,0 +1,80 @@
+{% extends 'layout/app/main.html' %}
+
+{% block sidebar %}
+  {# cta #}
+  <button class="btn btn-lg btn-primary w-100 mt-1" data-bs-toggle="modal" data-bs-target="#createProjectModal"><i class="bi bi-plus me-2"></i>Nueva meta</button>
+{% endblock %}
+
+{% block modals %}
+  <!-- Modal -->
+  <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createProjectModalLabel">Crear Nuevo Proyecto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="{% url 'project_create' %}">
+          <div class="modal-body">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="projectName" class="form-label">Nombre del Proyecto</label>
+              <input type="text" class="form-control" id="projectName" name="name" required maxlength="100" />
+            </div>
+            <div class="mb-3">
+              <label for="projectDescription" class="form-label">Descripción</label>
+              <textarea class="form-control" id="projectDescription" name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block main %}
+  {% include 'layout/app/shared/TopNav.html' with title='Mis Proyectos' %}
+
+  {% if messages %}
+    <div class="pt-0 my-1">
+      {% for message in messages %}
+        <div class="alert mb-0 alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} m-0 alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# autoscroll #}
+  <div class="overflow-auto p-2" style="height: 100dvh;">
+    {# body #}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th scope="col" class="w-100">Título</th>
+            <th scope="col" class="col-auto text-nowrap">Propietario</th>
+            <th scope="col" class="col-auto text-nowrap">Ultima modificacion</th>
+            <th scope="col" class="col-auto text-nowrap">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for project in projects %}
+            <tr>
+              <td class="w-100">{{ project.name }}</td>
+              <td class="col-auto text-nowrap">{{ project.created_by.get_full_name|default:project.created_by.username }}</td>
+              <td class="col-auto text-nowrap">{{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}</td>
+
+              <td class="col-auto text-nowrap">--</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
