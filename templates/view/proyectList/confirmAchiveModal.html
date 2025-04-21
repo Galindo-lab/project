@@ -1,0 +1,45 @@
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const archiveModal = document.getElementById('archiveModal')
+  
+    if (archiveModal) {
+      archiveModal.addEventListener('show.bs.modal', function (event) {
+        // Botón que disparó el modal
+        const button = event.relatedTarget
+  
+        // Extraer información de los atributos data-bs-*
+        const projectId = button.getAttribute('data-bs-project-id')
+        const projectName = button.getAttribute('data-bs-project-name')
+  
+        // Actualizar contenido del modal
+        document.getElementById('achiveProjectName').textContent = projectName
+        document.getElementById('projectId').value = projectId
+      })
+    }
+  })
+</script>
+
+<div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="archiveModalLabel">Confirmar archivado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="archiveForm" method="post" action="{% url 'archive_project' %}">
+        {% csrf_token %}
+        <input type="hidden" id="projectId" name="project_id" value="" />
+        <div class="modal-body">
+          <p>
+            ¿Estás seguro que deseas archivar el proyecto <strong id="achiveProjectName"></strong>?
+          </p>
+          <p class="text-muted">El proyecto no se eliminará, pero dejará de aparecer en la lista principal.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="fas fa-archive"></i> Confirmar archivado</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

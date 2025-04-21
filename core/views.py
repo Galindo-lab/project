@@ -5,14 +5,15 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView
+from django.views import View
+from django.views.generic import ListView, CreateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from core.forms import ProjectForm, RegisterForm
+from core.forms import ArchiveProjectForm, ProjectForm, RegisterForm
 from core.models import Project
 
 
@@ -39,6 +40,29 @@ def register(request):
         "view/register.html",
         {"form": form},  # Pasa el formulario con errores si los hay
     )
+
+
+# Vistas de Proyecto
+
+
+class ArchiveProjectView(FormView):
+    form_class = ArchiveProjectForm
+    success_url = reverse_lazy("home")  # URL a redirigir después de archivar
+
+    def form_valid(self, form):
+        project_id = form.cleaned_data["project_id"]
+        try:
+            project = Project.objects.get(pk=project_id)
+            project.is_archived = True
+            project.save()
+
+            messages.success(self.request, f"Proyecto archivado correctamente!")
+
+        except Project.DoesNotExist:
+            messages.error(self.request, f"Campo es obligatorio.")
+            pass 
+
+        return super().form_valid(form)
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
@@ -72,14 +96,14 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 
 class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
-    template_name = "view/proyectList.html"
+    template_name = "view/proyectList/main.html"
     context_object_name = "projects"
     ordering = ["-last_modified"]
     paginate_by = 15
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        search_query = self.request.GET.get('search', '').strip()
+        search_query = self.request.GET.get("search", "").strip()
 
         # Filtrar por archivo si no se solicita mostrar archivados
         if not self.request.GET.get("show_archived"):
@@ -88,8 +112,8 @@ class ProjectListView(LoginRequiredMixin, ListView):
         # Aplicar búsqueda si hay un término de búsqueda
         if search_query:
             queryset = queryset.filter(
-                Q(name__icontains=search_query) |
-                Q(created_by__username__icontains=search_query)
+                Q(name__icontains=search_query)
+                | Q(created_by__username__icontains=search_query)
             )
 
         return queryset.select_related("created_by")
@@ -99,5 +123,5 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context["show_archived"] = (
             self.request.GET.get("show_archived", "false").lower() == "true"
         )
-        context["search_query"] = self.request.GET.get('search', '')
+        context["search_query"] = self.request.GET.get("search", "")
         return context

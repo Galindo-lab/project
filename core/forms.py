@@ -6,11 +6,16 @@ from core.models import Project
 
 from django.utils import timezone
 
+
+class ArchiveProjectForm(forms.Form):
+    project_id = forms.IntegerField(widget=forms.HiddenInput())
+
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description']
-        
+        fields = ["name", "description"]
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.creation_date = timezone.now()
@@ -19,10 +24,10 @@ class ProjectForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField()
 
     class Meta:
         model = User
         fields = ["username", "email", "password1", "password2"]
-        

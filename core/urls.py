@@ -7,13 +7,14 @@ from django.contrib.auth import views as auth_views
 from project import settings
 
 from core.views import index
-from core.views import register, ProjectListView, ProjectCreateView
+from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView
 
 urlpatterns = [
     path("home/", ProjectListView.as_view(), name="home"),
     
     # proyect
     path('projects/create/', ProjectCreateView.as_view(), name='project_create'),
+    path('project/archive/', ArchiveProjectView.as_view(), name='archive_project'),
     
     # Login
     path('login/', auth_views.LoginView.as_view(template_name='view/login.html'), name='login'),

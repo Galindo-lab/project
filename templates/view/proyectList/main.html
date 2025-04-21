@@ -1,0 +1,58 @@
+{% extends 'layout/app/main.html' %}
+
+{% block sidebar %}
+  {# cta #}
+  <button class="btn btn-lg btn-primary w-100 mt-1" data-bs-toggle="modal" data-bs-target="#createProjectModal"><i class="bi bi-plus me-2"></i>Nueva meta</button>
+
+  {# filtros #}
+  <form class="list-group list-group-flush mt-4">
+    <button type="submit" name="show_archived" value="true" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      Archivados
+
+      {% if show_archived %}<i class="bi bi-check-circle"></i>{% endif %}
+    </button>
+  </form>
+{% endblock %}
+
+{% block modals %}
+  {% include 'view/proyectList/createProyectModal.html' %}
+  {% include 'view/proyectList/confirmAchiveModal.html' %}
+{% endblock %}
+
+{% block main %}
+  {% include 'layout/app/shared/TopNav.html' with title='Mis Proyectos' %}
+  {% include 'layout/app/shared/Messages.html' %}
+
+  {# autoscroll #}
+  <div class="overflow-auto p-2" style="height: 100dvh;">
+    {# body #}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th scope="col" class="w-100">Título</th>
+            <th scope="col" class="col-auto text-nowrap">Propietario</th>
+            <th scope="col" class="col-auto text-nowrap">Ultima modificacion</th>
+            <th scope="col" class="col-auto text-nowrap">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for project in projects %}
+            <tr>
+              <td class="w-100">{{ project.name }}</td>
+              <td class="col-auto text-nowrap">{{ project.created_by.get_full_name|default:project.created_by.username }}</td>
+              <td class="col-auto text-nowrap">{{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}</td>
+
+              <td class="col-auto text-nowrap">
+                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#archiveModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}">
+                  <i class="fas fa-archive"></i>
+                  Archivar
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
