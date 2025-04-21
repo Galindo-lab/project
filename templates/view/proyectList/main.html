@@ -37,6 +37,12 @@
 
   {# autoscroll #}
   <div class="overflow-auto p-2" style="height: 100dvh;">
+    {% if request.GET.search %}
+      <div class="ps-2 my-2">
+        <span class="fw-bold">Resultados para: '{{ request.GET.search }}'</span>
+      </div>
+    {% endif %}
+
     {# body #}
     <div class="table-responsive">
       <table class="table table-hover mb-0">

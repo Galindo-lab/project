@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db.models import Q
@@ -123,8 +124,10 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["show_archived"] = (
-            self.request.GET.get("show_archived", "false").lower() == "true"
-        )
+        query_params = self.request.GET.copy()
+        if "page" in query_params:
+            del query_params["page"]  # Para evitar conflictos con la paginación
+        context["current_query"] = urlencode(query_params)
         context["search_query"] = self.request.GET.get("search", "")
+        context["current_filter"] = self.request.GET.get("filter", "")
         return context
