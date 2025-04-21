@@ -106,7 +106,10 @@ class ProjectListView(LoginRequiredMixin, ListView):
         search_query = self.request.GET.get("search", "").strip()
 
         # Filtrar por archivo si no se solicita mostrar archivados
-        if not self.request.GET.get("show_archived"):
+        if self.request.GET.get("filter") == "archived":
+            queryset = queryset.filter(is_archived=True)
+            
+        if self.request.GET.get("filter") == "active":
             queryset = queryset.filter(is_archived=False)
 
         # Aplicar búsqueda si hay un término de búsqueda

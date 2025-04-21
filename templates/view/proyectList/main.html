@@ -6,10 +6,22 @@
 
   {# filtros #}
   <form class="list-group list-group-flush mt-4">
-    <button type="submit" name="show_archived" value="true" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-      Archivados
+    <button type="submit" name="filter" value="active" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      Activos{% if request.GET.filter == 'active' %}
+        <i class="bi bi-check-circle"></i>
+      {% endif %}
+    </button>
 
-      {% if show_archived %}<i class="bi bi-check-circle"></i>{% endif %}
+    <button type="submit" name="filter" value="all" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      Todos{% if not request.GET.filter or request.GET.filter == 'all' %}
+        <i class="bi bi-check-circle"></i>
+      {% endif %}
+    </button>
+
+    <button type="submit" name="filter" value="archived" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      Archivados{% if request.GET.filter == 'archived' %}
+        <i class="bi bi-check-circle"></i>
+      {% endif %}
     </button>
   </form>
 {% endblock %}
@@ -44,10 +56,12 @@
               <td class="col-auto text-nowrap">{{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}</td>
 
               <td class="col-auto text-nowrap">
-                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#archiveModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}">
-                  <i class="fas fa-archive"></i>
-                  Archivar
-                </button>
+                {% if not project.is_archived %}
+                  <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#archiveModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}">
+                    <i class="fas fa-archive"></i>
+                    Archivar
+                  </button>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}
