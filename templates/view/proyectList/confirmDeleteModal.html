@@ -15,12 +15,12 @@
         <h5 class="modal-title">Confirmar archivado</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="post" action="{% url 'archive_project' %}">
+      <form method="post" action="{% url 'delete_project' %}">
         {% csrf_token %}
         <input type="hidden" name="project_id" :value="projectId">
         <div class="modal-body">
           <p>
-            ¿Estás seguro que deseas archivar el proyecto 
+            ¿Estás seguro que deseas Eliminar el proyecto 
             <strong x-text="projectName"></strong>?
           </p>
           <p class="text-muted">El proyecto no se eliminará, pero dejará de aparecer en la lista principal.</p>

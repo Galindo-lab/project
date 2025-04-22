@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import index
+from core.views import DeleteProjectView, index
 from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     # proyect
     path('projects/create/', ProjectCreateView.as_view(), name='project_create'),
     path('project/archive/', ArchiveProjectView.as_view(), name='archive_project'),
+    path('project/delete/', DeleteProjectView.as_view(), name='delete_project'),
     
     # Login
     path('login/', auth_views.LoginView.as_view(template_name='view/login.html'), name='login'),

@@ -24,7 +24,7 @@ class Project(models.Model):
     creation_date = models.DateTimeField()
     last_modified = models.DateTimeField()
     is_archived = models.BooleanField(default=False)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

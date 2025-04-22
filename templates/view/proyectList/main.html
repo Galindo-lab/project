@@ -27,8 +27,9 @@
 {% endblock %}
 
 {% block modals %}
-  {% include 'view/proyectList/createProyectModal.html' %}
-  {% include 'view/proyectList/confirmAchiveModal.html' %}
+  {% include 'view/proyectList/createProyectModal.html' with id="createProjectModal" %}
+  {% include 'view/proyectList/confirmAchiveModal.html' with id="archiveModal" %}
+  {% include 'view/proyectList/confirmDeleteModal.html' with id="deleteModal" %}
 {% endblock %}
 
 {% block main %}
@@ -58,16 +59,29 @@
           {% for project in projects %}
             <tr>
               <td class="w-100">{{ project.name }}</td>
-              <td class="col-auto text-nowrap">{{ project.created_by.get_full_name|default:project.created_by.username }}</td>
+              <td class="col-auto text-nowrap">{{ project.owner.get_full_name|default:project.owner.username }}</td>
               <td class="col-auto text-nowrap">{{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}</td>
 
               <td class="col-auto text-nowrap">
                 {% if not project.is_archived %}
-                  <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#archiveModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}">
-                    <i class="fas fa-archive"></i>
+                  <button 
+                    class="btn btn-warning btn-sm" 
+                    data-bs-toggle="modal"
+                    data-bs-target="#archiveModal"
+                    data-bs-project-id="{{ project.id }}"
+                    data-bs-project-name="{{ project.name }}">
                     Archivar
                   </button>
                 {% endif %}
+
+                <button 
+                  class="btn btn-danger btn-sm" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#deleteModal" 
+                  data-bs-project-id="{{ project.id }}" 
+                  data-bs-project-name="{{ project.name }}" >
+                  Eliminar
+                </button>
               </td>
             </tr>
           {% endfor %}

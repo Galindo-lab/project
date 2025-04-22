@@ -32,21 +32,39 @@ def register(request):
         if form.is_valid():
             form.save()
             return redirect("home")
-        # Si el formulario no es válido, se renderiza con los errores
     else:
-        form = RegisterForm()  # Formulario vacío para GET requests
+        form = RegisterForm()  
 
     return render(
         request,
         "view/register.html",
-        {"form": form},  # Pasa el formulario con errores si los hay
+        {"form": form}, 
     )
 
 
 # Vistas de Proyecto
 
 
-class ArchiveProjectView(FormView):
+class DeleteProjectView(LoginRequiredMixin, FormView):
+    form_class = ArchiveProjectForm
+    success_url = reverse_lazy("home")
+
+    def form_valid(self, form):
+        project_id = form.cleaned_data['project_id']
+        project = get_object_or_404(Project, pk=project_id)
+        
+        if self.request.user == project.owner:
+            project.delete()
+            messages.success(self.request, "Proyecto eliminado correctamente")
+        else:
+            messages.error(self.request, "No tienes permiso para eliminar este proyecto")
+            return self.form_invalid(form)
+            
+        return super().form_valid(form)
+
+
+
+class ArchiveProjectView(LoginRequiredMixin, FormView):
     form_class = ArchiveProjectForm
     success_url = reverse_lazy("home")  # URL a redirigir después de archivar
 
@@ -72,7 +90,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("home")  # URL a donde redirigir
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
+        form.instance.owner = self.request.user
         form.instance.creation_date = timezone.now()
         form.instance.last_modified = timezone.now()
 
@@ -117,10 +135,10 @@ class ProjectListView(LoginRequiredMixin, ListView):
         if search_query:
             queryset = queryset.filter(
                 Q(name__icontains=search_query)
-                | Q(created_by__username__icontains=search_query)
+                | Q(owner__username__icontains=search_query)
             )
 
-        return queryset.select_related("created_by")
+        return queryset.select_related("owner")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

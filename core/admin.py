@@ -9,7 +9,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_by', 'creation_date', 'is_archived')
+    list_display = ('name', 'owner', 'creation_date', 'is_archived')
     list_filter = ('is_archived',)
     search_fields = ('name', 'description')
     date_hierarchy = 'creation_date'
