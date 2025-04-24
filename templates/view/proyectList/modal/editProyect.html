@@ -1,0 +1,27 @@
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createProjectModalLabel">Crear Nuevo Proyecto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'project_create' %}">
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="projectName" class="form-label">Nombre del Proyecto</label>
+            <input type="text" class="form-control" id="projectName" name="name" required maxlength="100" />
+          </div>
+          <div class="mb-3">
+            <label for="projectDescription" class="form-label">Descripción</label>
+            <textarea class="form-control" id="projectDescription" name="description" style="height: 100px; min-height: 100px;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Crear Proyecto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

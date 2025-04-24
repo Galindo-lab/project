@@ -3,7 +3,6 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db.models import Q
-from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,7 +13,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from core.forms import ArchiveProjectForm, ProjectForm, RegisterForm
+from core.forms import ArchiveProjectForm, RegisterForm
 from core.models import Project
 
 
