@@ -8,9 +8,10 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, CreateView, FormView
+from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from core.forms import ArchiveProjectForm, RegisterForm
@@ -32,16 +33,49 @@ def register(request):
             form.save()
             return redirect("home")
     else:
-        form = RegisterForm()  
+        form = RegisterForm()
 
     return render(
         request,
         "view/register.html",
-        {"form": form}, 
+        {"form": form},
     )
 
 
 # Vistas de Proyecto
+
+
+class ProjectEditView(LoginRequiredMixin, UpdateView):
+    model = Project
+    fields = ["name", "description", "is_archived"]
+    template_name = (
+        "view/proyectEdit/main.html"
+    )
+    success_url = reverse_lazy("home")
+
+    def get_object(self, queryset=None):
+        project = super().get_object(queryset)
+        if self.request.user != project.owner:
+            raise PermissionDenied("No tienes permiso para editar este proyecto")
+        return project
+
+    def form_valid(self, form):
+        form.instance.last_modified = timezone.now()
+
+        project_name = form.cleaned_data.get("name", "proyecto")
+        messages.success(
+            self.request, f"Proyecto '{project_name}' actualizado correctamente!"
+        )
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(
+                    self.request, f"Error en '{form.fields[field].label}': {error}"
+                )
+        return super().form_invalid(form)
 
 
 class DeleteProjectView(LoginRequiredMixin, FormView):
@@ -49,23 +83,24 @@ class DeleteProjectView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy("home")
 
     def form_valid(self, form):
-        project_id = form.cleaned_data['project_id']
+        project_id = form.cleaned_data["project_id"]
         project = get_object_or_404(Project, pk=project_id)
-        
+
         if self.request.user == project.owner:
             project.delete()
             messages.success(self.request, "Proyecto eliminado correctamente")
         else:
-            messages.error(self.request, "No tienes permiso para eliminar este proyecto")
+            messages.error(
+                self.request, "No tienes permiso para eliminar este proyecto"
+            )
             return self.form_invalid(form)
-            
-        return super().form_valid(form)
 
+        return super().form_valid(form)
 
 
 class ArchiveProjectView(LoginRequiredMixin, FormView):
     form_class = ArchiveProjectForm
-    success_url = reverse_lazy("home")  # URL a redirigir después de archivar
+    success_url = reverse_lazy("home")
 
     def form_valid(self, form):
         project_id = form.cleaned_data["project_id"]
@@ -78,7 +113,7 @@ class ArchiveProjectView(LoginRequiredMixin, FormView):
 
         except Project.DoesNotExist:
             messages.error(self.request, f"Campo es obligatorio.")
-            pass 
+            pass
 
         return super().form_valid(form)
 
@@ -86,7 +121,7 @@ class ArchiveProjectView(LoginRequiredMixin, FormView):
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     fields = ["name", "description", "is_archived"]
-    success_url = reverse_lazy("home")  # URL a donde redirigir
+    success_url = reverse_lazy("home")  
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -101,8 +136,6 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-
-        # Mensajes detallados por cada campo con error
         for field, errors in form.errors.items():
             for error in errors:
                 messages.error(
@@ -120,13 +153,12 @@ class ProjectListView(LoginRequiredMixin, ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(owner=self.request.user)
         search_query = self.request.GET.get("search", "").strip()
 
-        # Filtrar por archivo si no se solicita mostrar archivados
         if self.request.GET.get("filter") == "archived":
             queryset = queryset.filter(is_archived=True)
-            
+
         if self.request.GET.get("filter") == "active":
             queryset = queryset.filter(is_archived=False)
 
@@ -143,7 +175,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         query_params = self.request.GET.copy()
         if "page" in query_params:
-            del query_params["page"]  # Para evitar conflictos con la paginación
+            del query_params["page"]  
         context["current_query"] = urlencode(query_params)
         context["search_query"] = self.request.GET.get("search", "")
         context["current_filter"] = self.request.GET.get("filter", "")

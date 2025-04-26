@@ -1,16 +1,28 @@
-<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+<div 
+  class="modal fade" 
+  id="{{ id }}" 
+  x-data="{ projectId: '', projectName: '' }"
+  x-init="
+    $el.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      projectId = button?.getAttribute('data-bs-project-id') || '';
+      projectName = button?.getAttribute('data-bs-project-name') || '';
+    });
+  ">
   <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="createProjectModalLabel">Crear Nuevo Proyecto</h5>
+        <h5 class="modal-title">Editar Proyecto</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="post" action="{% url 'project_create' %}">
+      <form method="post" action="{% url 'update_project' %}">
+        {% csrf_token %}
+        <input type="hidden" name="project_id" :value="projectId">
+
         <div class="modal-body">
-          {% csrf_token %}
           <div class="mb-3">
             <label for="projectName" class="form-label">Nombre del Proyecto</label>
-            <input type="text" class="form-control" id="projectName" name="name" required maxlength="100" />
+            <input :value="projectName" type="text" class="form-control" id="projectName" name="name" required maxlength="100" />
           </div>
           <div class="mb-3">
             <label for="projectDescription" class="form-label">Descripción</label>

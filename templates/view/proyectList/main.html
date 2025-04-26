@@ -1,35 +1,38 @@
 {% extends 'layout/app/main.html' %}
 
+{% block modals %}
+  {% include 'view/proyectList/modal/editProyect.html' with id='editModal' %}
+  {% include 'view/proyectList/modal/createProyect.html' with id='createProjectModal' %}
+  {% include 'view/proyectList/modal/confirmAchive.html' with id='archiveModal' %}
+  {% include 'view/proyectList/modal/confirmDelete.html' with id='deleteModal' %}
+{% endblock %}
+
 {% block sidebar %}
   {# cta #}
-  <button class="btn btn-lg btn-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#createProjectModal"><i class="bi bi-plus me-2"></i>Nueva meta</button>
+  <button class="btn btn-lg btn-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+    <i class="bi bi-plus me-2"></i>Proyecto
+  </button>
 
   {# filtros #}
-  <form class="list-group list-group-flush mt-5">
-    <button type="submit" name="filter" value="active" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+  <form class="list-group list-group-flush bg-transparent  mt-4">
+    <button type="submit" name="filter" value="active" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">
       Activos{% if request.GET.filter == 'active' %}
         <i class="bi bi-check-circle"></i>
       {% endif %}
     </button>
 
-    <button type="submit" name="filter" value="all" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+    <button type="submit" name="filter" value="all" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">
       Todos{% if not request.GET.filter or request.GET.filter == 'all' %}
         <i class="bi bi-check-circle"></i>
       {% endif %}
     </button>
 
-    <button type="submit" name="filter" value="archived" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+    <button type="submit" name="filter" value="archived" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">
       Archivados{% if request.GET.filter == 'archived' %}
         <i class="bi bi-check-circle"></i>
       {% endif %}
     </button>
   </form>
-{% endblock %}
-
-{% block modals %}
-  {% include 'view/proyectList/modal/createProyect.html' with id="createProjectModal" %}
-  {% include 'view/proyectList/modal/confirmAchive.html' with id="archiveModal" %}
-  {% include 'view/proyectList/modal/confirmDelete.html' with id="deleteModal" %}
 {% endblock %}
 
 {% block main %}
@@ -38,8 +41,7 @@
   {# autoscroll #}
 
   <div class="overflow-auto p-2" style="height: 100dvh;">
-
-  {% include 'layout/app/shared/Messages.html' %}
+    {% include 'layout/app/shared/Messages.html' %}
 
     {% if request.GET.search %}
       <div class="ps-2 my-2">
@@ -67,34 +69,16 @@
 
               <td class="col-auto text-nowrap">
                 {% if not project.is_archived %}
-                  <button 
-                    class="btn btn-link btn-sm border-0" 
-                    data-bs-toggle="modal"
-                    data-bs-target="#archiveModal"
-                    data-bs-project-id="{{ project.id }}"
-                    data-bs-project-name="{{ project.name }}">
-                    <i class="bi bi-archive"></i>
-                  </button>
+                  {# No se puede eliminar parcialmente #}
+                  <button class="btn btn-link btn-sm border-0" data-bs-toggle="modal" data-bs-target="#archiveModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}"><i class="bi bi-archive"></i></button>
                 {% endif %}
 
-                <button 
-                  class="btn btn-link btn-sm border-0" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#deleteModal" 
-                  data-bs-project-id="{{ project.id }}" 
-                  data-bs-project-name="{{ project.name }}" >
-                  <i class="bi bi-trash"></i>
-                </button>
+                {% if project.is_archived %}
+                  {# eliminar permanentemente #}
+                  <button class="btn btn-link btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}"><i class="bi bi-trash"></i></button>
+                {% endif %}
 
-                <button 
-                  class="btn btn-link btn-sm border-0" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#editModal" 
-                  data-bs-project-id="{{ project.id }}" 
-                  data-bs-project-name="{{ project.name }}" >
-                  <i class="bi bi-pencil"></i>
-                </button>
-                
+                <button class="btn btn-link btn-sm border-0" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}"><i class="bi bi-pencil"></i></button>
               </td>
             </tr>
           {% endfor %}
