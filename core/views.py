@@ -46,79 +46,68 @@ def register(request):
 
 # Vistas de Objetivos
 class GoalsListView(LoginRequiredMixin, ListView):
-    template_name = 'view/goalList/main.html'
-    context_object_name = 'goals'
+    template_name = "view/goalList/main.html"
+    context_object_name = "goals"
     paginate_by = 10
-    
+
     def get_queryset(self):
-        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        
+        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
+
         get_goal_pk = self.request.GET.get("goal_pk")
         if get_goal_pk and get_goal_pk != "":
             return self.project.goal_set.filter(pk=get_goal_pk)
-            
+
         return Goal.objects.filter(project=self.project)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['project'] = self.project
+        context["project"] = self.project
         return context
 
 
 class GoalCreateView(LoginRequiredMixin, CreateView):
     model = Goal
-    fields = ["name", "description", "completion_percentage"]  # Asegúrate de incluir todos los campos requeridos
-    
+    fields = [
+        "name",
+        "description",
+        "project",
+        "completion_percentage",
+    ]  
+
     def get_success_url(self):
-        project_id = self.request.POST.get('project_pk')
-        if not project_id:
-            raise ValidationError("Project ID no encontrado en el formulario")
-        return reverse('list_goals', kwargs={'pk': project_id})
+        return reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
 
     def form_valid(self, form):
-        project_id = self.request.POST.get('project_pk')
-        if not project_id:
-            messages.error(self.request, "No se especificó el proyecto")
-            return redirect('home')
-            
         try:
-            # Establece un valor por defecto si completion_percentage no fue proporcionado
-            if not form.cleaned_data.get('completion_percentage'):
-                form.instance.completion_percentage = 0.00  # Valor por defecto
-            
-            form.instance.project_id = project_id
-            form.instance.creation_date = timezone.now()
-            form.instance.last_modified = timezone.now()
-
             messages.success(
                 self.request,
-                f"Objetivo '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!"
+                f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!",
             )
             return super().form_valid(form)
+
         except Exception as e:
             messages.error(self.request, f"Error al crear objetivo: {str(e)}")
-            return redirect(reverse('list_goals', kwargs={'pk': project_id}))
+        return redirect(
+            reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
+        )
 
     def form_invalid(self, form):
-        project_id = self.request.POST.get('project_pk', '1')  # Fallback a 1 si no existe
-        
         for field, errors in form.errors.items():
             for error in errors:
                 messages.error(
-                    self.request,
-                    f"Error en {form.fields[field].label}: {error}"
+                    self.request, f"Error en {form.fields[field].label}: {error}"
                 )
-        
-        return redirect(reverse('list_goals', kwargs={'pk': project_id}))
+
+        return redirect(reverse("list_goals", kwargs={"pk": self.request.POST.get("project")}))
+
 
 # Vistas de Proyecto
+
 
 class ProjectEditView(LoginRequiredMixin, UpdateView):
     model = Project
     fields = ["name", "description", "is_archived"]
-    template_name = (
-        "view/proyectEdit/main.html"
-    )
+    template_name = "view/proyectEdit/main.html"
     success_url = reverse_lazy("home")
 
     def get_object(self, queryset=None):
@@ -189,7 +178,7 @@ class ArchiveProjectView(LoginRequiredMixin, FormView):
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     fields = ["name", "description", "is_archived"]
-    success_url = reverse_lazy("home")  
+    success_url = reverse_lazy("home")
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -243,7 +232,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         query_params = self.request.GET.copy()
         if "page" in query_params:
-            del query_params["page"]  
+            del query_params["page"]
         context["current_query"] = urlencode(query_params)
         context["search_query"] = self.request.GET.get("search", "")
         context["current_filter"] = self.request.GET.get("filter", "")

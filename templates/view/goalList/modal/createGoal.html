@@ -8,7 +8,7 @@
       <form method="post" action="{% url 'create_goal' %}">
         <div class="modal-body">
           {% csrf_token %}
-          <input type="hidden" name="project_pk" value="{{ project.pk }}" />
+          <input type="hidden" name="project" value="{{ project.pk }}" />
           <input type="hidden" name="completion_percentage" value="0.00" />
           
           <div class="mb-3">
