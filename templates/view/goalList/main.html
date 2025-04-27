@@ -6,13 +6,13 @@
 {% endblock %}
 
 {% block sidebar %}
-  <button class="btn btn-lg btn-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Meta</button>
+  <button class="btn btn-lg btn-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
 
   <form class="list-group list-group-flush bg-transparent mt-4">
-    {% for goal in goals %}
-      <button type="submit" name="filter" value="{{goal.pk}}" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-        {{ goal.name }}
-      </button>
+    <button type="submit" name="goal_pk" value="" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">Todos</button>
+
+    {% for goal in project.goal_set.all %}
+      <button type="submit" name="goal_pk" value="{{ goal.pk }}" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">{{ goal.name }}</button>
     {% endfor %}
   </form>
 {% endblock %}
@@ -28,8 +28,8 @@
     {% endif %}
 
     {% for goal in goals %}
-      <div class="card mb-3">
-        <div class="card-header">
+      <div class="card mb-2">
+        <div class="card-header {% if not request.GET.goal_pk %}border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
             <div>
               <span class="fw-bold mb-0">{{ goal.name }}</span>
@@ -37,33 +37,38 @@
             </div>
             <!-- Barra de progreso movida aquí y oculta en móvil -->
             <div class="d-none d-md-block">
-              <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></button>
-              <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></button>
+              {% if not request.GET.goal_pk %}
+                <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></button>
+                <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></button>
+              {% endif %}
+              <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-outline-primary btn-sm border-0"><i class="bi bi-plus-lg"></i></button>
             </div>
           </div>
         </div>
 
         <!-- Lista de tareas flushed -->
-        <ul class="list-group list-group-flush">
-          <!-- Primer elemento de ejemplo -->
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <span class="fw-semi">Tarea 1</span>
-              <small class="text-muted d-block">Descripción breve de la tarea</small>
-            </div>
-            <span class="badge bg-primary rounded-pill">En progreso</span>
-          </li>
+        {% if request.GET.goal_pk %}
+          <ul class="list-group list-group-flush">
+            <!-- Primer elemento de ejemplo -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="fw-semi">Tarea 1</span>
+                <small class="text-muted d-block">Descripción breve de la tarea</small>
+              </div>
+              <span class="badge bg-primary rounded-pill">En progreso</span>
+            </li>
 
-          <!-- Segundo elemento de ejemplo -->
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <span class="">Tarea 2</span>
-              <small class="text-muted d-block">Descripción breve de la tarea</small>
-            </div>
-            <span class="badge bg-success rounded-pill">Completada</span>
-          </li>
-        </ul>
+            <!-- Segundo elemento de ejemplo -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="">Tarea 2</span>
+                <small class="text-muted d-block">Descripción breve de la tarea</small>
+              </div>
+              <span class="badge bg-success rounded-pill">Completada</span>
+            </li>
+          </ul>
+        {% endif %}
       </div>
     {% endfor %}
   </div>

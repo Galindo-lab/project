@@ -50,6 +50,12 @@ class GoalsListView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        
+        get_goal_pk = self.request.GET.get("goal_pk")
+        if get_goal_pk:
+            if get_goal_pk != "":
+                return self.project.goal_set.filter(pk=get_goal_pk)
+            
         return Goal.objects.filter(project=self.project)
     
     def get_context_data(self, **kwargs):

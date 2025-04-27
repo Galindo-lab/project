@@ -1,8 +1,8 @@
 <div x-data="{ showSearch: false }" class="bg-body-tertiary">
-    <!-- Barra unificada que maneja ambos estados -->
+    {# Barra unificada que maneja ambos estados #}
     <nav class="navbar navbar-expand-lg" style="height: 58px;">
         <div class="container-fluid ps-2">
-            <!-- Contenido normal (se muestra cuando showSearch = false) -->
+            {# Contenido normal (se muestra cuando showSearch = false) #}
             <template x-if="!showSearch">
                 <div class="d-flex w-100 align-items-center">
                     <div class="text-body text-decoration-none ms-2">
@@ -27,10 +27,17 @@
                 </div>
             </template>
 
-            <!-- Barra de búsqueda (se muestra cuando showSearch = true) -->
+            {# Barra de búsqueda (se muestra cuando showSearch = true) #}
             <template x-if="showSearch">
                 <div class="d-flex w-100">
                     <form @submit.prevent="$el.submit()" class="d-flex w-100" method="get">
+                        {# Agregar todos los parámetros GET existentes (excepto 'search') como inputs hidden #}
+                        {% for key, value in request.GET.items %}
+                            {% if key != 'search' %}
+                                <input type="hidden" name="{{ key }}" value="{{ value }}">
+                            {% endif %}
+                        {% endfor %}
+                        
                         <div class="input-group border rounded flex-grow-1">
                             <button type="submit" class="btn btn-outline-secondary border-0 ">
                                 <i class="bi bi-search"></i>
@@ -39,7 +46,7 @@
                                    placeholder="Buscar..." value="{{request.GET.search}}" x-ref="searchInput"
                                    @focus="if($el.value === '') $el.value = ' '">
                         </div>
-
+                
                         <button @click="showSearch = false; $refs.searchInput.value = ''" 
                                 class="btn btn-outline-secondary border-0 ms-1" type="button">
                             <i class="bi bi-x-lg"></i>
