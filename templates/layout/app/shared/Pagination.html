@@ -1,0 +1,55 @@
+
+{% if is_paginated %}
+  <ul class="pagination {{ class }}">
+    
+    <!-- Primera página -->
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+      <a class="page-link" href="?page=1{% if current_query %}&{{ current_query }}{% endif %}" aria-label="First">
+        <i class="bi bi-chevron-double-left"></i>
+      </a>
+    </li>
+    
+    <!-- Anterior -->
+    <li class="page-item d-none d-md-block {% if not page_obj.has_previous %}disabled{% endif %}">
+      <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}{% if current_query %}&{{ current_query }}{% endif %}" aria-label="Previous">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+    </li>
+    
+    <!-- Páginas cercanas -->
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+      <li class="page-item active" aria-current="page">
+        <span class="page-link">{{ num }}</span>
+      </li>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} 
+      <li class="page-item">
+        <a class="page-link" href="?page={{ num }}{% if current_query %}&{{ current_query }}{% endif %}">{{ num }}</a>
+      </li>
+      {% elif num == 1 or num == page_obj.paginator.num_pages %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ num }}{% if current_query %}&{{ current_query }}{% endif %}">{{ num }}</a>
+      </li>
+      {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+      <li class="page-item disabled">
+        <span class="page-link">...</span>
+      </li>
+      {% endif %}
+    {% endfor %}
+    
+    <!-- Siguiente -->
+    <li class="page-item d-none d-md-block {% if not page_obj.has_next %}disabled{% endif %}">
+      <a class="page-link" href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}{% if current_query %}&{{ current_query }}{% endif %}" aria-label="Next">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    </li>
+    
+    <!-- Última página -->
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_query %}&{{ current_query }}{% endif %}" aria-label="Last">
+        <i class="bi bi-chevron-double-right"></i>
+      </a>
+    </li>
+  </ul>
+
+{% endif %}
