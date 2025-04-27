@@ -1,0 +1,62 @@
+{% extends 'layout/app/main.html' %}
+
+{% block modals %}
+  {% include 'layout/app/shared/Messages.html' %}
+  {% include 'view/goalList/modal/createGoal.html' with id='createGoalModal' %}
+{% endblock %}
+
+{% block sidebar %}
+  <button class="btn btn-lg btn-primary w-100 mt-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Meta</button>
+{% endblock %}
+
+{% block main %}
+  {% include 'layout/app/shared/TopNav.html' with tabs='true' %}
+
+  <div class="p-2" style="height: 100dvh;">
+    {% if request.GET.search %}
+      <div class="ps-2 my-2">
+        <span class="fw-bold">Resultados para: '{{ request.GET.search }}'</span>
+      </div>
+    {% endif %}
+
+    {% for goal in goals %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <div class="d-flex align-items-center mb-1 justify-content-between">
+            <h5 class="mb-0">{{ goal.name }}</h5>
+            <!-- Barra de progreso movida aquí y oculta en móvil -->
+            <div class="d-none d-md-block">
+              <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></button>
+              <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></button>
+              <button class="btn btn-outline-primary btn-sm border-0"><i class="bi bi-plus-lg"></i></button>
+            </div>
+          </div>
+          <p class="mb-2 text-muted small">{{ goal.description }}</p>
+        </div>
+
+        <div class="p-0">
+          <!-- Lista de tareas flushed -->
+          <ul class="list-group list-group-flush">
+            <!-- Primer elemento de ejemplo -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="fw-bold">Tarea 1</span>
+                <small class="text-muted d-block">Descripción breve de la tarea</small>
+              </div>
+              <span class="badge bg-primary rounded-pill">En progreso</span>
+            </li>
+
+            <!-- Segundo elemento de ejemplo -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="fw-bold">Tarea 2</span>
+                <small class="text-muted d-block">Descripción breve de la tarea</small>
+              </div>
+              <span class="badge bg-success rounded-pill">Completada</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

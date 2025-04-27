@@ -22,8 +22,7 @@ class CollaboratorAdmin(admin.ModelAdmin):
 
 @admin.register(Goal)
 class GoalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'project', 'priority', 'completion_percentage')
-    list_filter = ('priority',)
+    list_display = ('name', 'project', 'completion_percentage')
     search_fields = ('name', 'description')
 
 @admin.register(Task)

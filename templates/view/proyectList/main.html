@@ -59,8 +59,8 @@
         </thead>
         <tbody>
           {% for project in projects %}
-            <tr>
-              <td class="w-100">{{ project.name }}</td>
+            <tr> {# agregar link a href=" #} 
+              <td class="w-100" onclick="window.location='{% url 'list_goals' project.id %}';" style="cursor: pointer;">{{ project.name }}</td>
               <td class="col-auto text-nowrap">{{ project.owner.get_full_name|default:project.owner.username }}</td>
               <td class="col-auto text-nowrap">{{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}</td>
 

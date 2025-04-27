@@ -1,11 +1,25 @@
-<div x-data="{ showSearch: false }" style="height: 58px;" class="bg-body-tertiary">
+<div x-data="{ showSearch: false }" class="bg-body-tertiary">
     {# Barra de navegación principal #}
-    <nav :class="{'d-none': showSearch}" class="navbar navbar-expand-lg">
+    <nav :class="{'d-none': showSearch}" class="navbar navbar-expand-lg" style="height: 58px;" >
         <div class="container-fluid ps-0">
             {# Nombres y tabs #}
-            <span class="text-body text-decoration-none fs-5 ms-3 fw-medium" href="#">
-                <div class="d-none d-lg-flex">{{ title }}</div>
-                <div class="d-flex d-lg-none">
+            <span class="text-body text-decoration-none ms-2 fw-medium" href="#">
+                <div class="d-none d-lg-flex fs-5">{{ title }}</div>
+
+                {% if tabs %}
+                <div>
+                    <ul class="nav nav-underline d-none d-lg-flex">
+                        <li class="nav-item">
+                          <a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a>
+                        </li>
+                      </ul>
+                </div>
+                {% endif %}
+
+                <div class="d-flex d-lg-none fs-5">
                 <i class="bi bi-layout-wtf me-2"></i>ProjectWise
                 </div>
             </span>
@@ -20,7 +34,7 @@
     </nav>
 
     {# Barra de busqueda #}
-    <div :class="{'d-none': !showSearch}" class="navbar navbar-expand-lg d-none">
+    <div :class="{'d-none': !showSearch}" class="navbar navbar-expand-lg d-none " style="height: 58px;" >
         <div class="container-fluid ps-0" >
             <form class="d-flex w-100" role="search" method="get" >                
                 <div class="input-group border rounded">
@@ -31,7 +45,7 @@
                 </div>
 
                 <button @click.prevent="showSearch = false" class="btn btn-outline-secondary border-0 mx-1" type="button">
-                    <i class="bi bi-chevron-left"></i>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </form>
         </div>

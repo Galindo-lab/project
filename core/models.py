@@ -34,14 +34,8 @@ class Collaborator(models.Model):
 
 
 class Goal(models.Model):  # formerly "Meta"
-    class Priority(models.TextChoices):
-        LOW = "low", "Low"
-        MEDIUM = "medium", "Medium"
-        HIGH = "high", "High"
-
     name = models.CharField(max_length=100)
     description = models.TextField()
-    priority = models.CharField(max_length=10, choices=Priority.choices)
     completion_percentage = models.DecimalField(max_digits=5, decimal_places=2)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 

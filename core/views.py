@@ -15,7 +15,7 @@ from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from core.forms import ArchiveProjectForm, RegisterForm
-from core.models import Project
+from core.models import Goal, Project
 
 
 @login_required
@@ -42,8 +42,24 @@ def register(request):
     )
 
 
-# Vistas de Proyecto
+# Vistas de Objetivos
+class GoalsListView(LoginRequiredMixin, ListView):
+    template_name = 'view/goalList/main.html'
+    context_object_name = 'goals'
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return Goal.objects.filter(project=self.project)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.project
+        return context
 
+
+
+
+# Vistas de Proyecto
 
 class ProjectEditView(LoginRequiredMixin, UpdateView):
     model = Project
@@ -150,7 +166,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
     template_name = "view/proyectList/main.html"
     context_object_name = "projects"
     ordering = ["-last_modified"]
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(owner=self.request.user)
