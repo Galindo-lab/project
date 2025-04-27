@@ -46,6 +46,7 @@ def register(request):
 class GoalsListView(LoginRequiredMixin, ListView):
     template_name = 'view/goalList/main.html'
     context_object_name = 'goals'
+    paginate_by = 1
     
     def get_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
