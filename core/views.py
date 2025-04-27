@@ -150,7 +150,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
     template_name = "view/proyectList/main.html"
     context_object_name = "projects"
     ordering = ["-last_modified"]
-    paginate_by = 15
+    paginate_by = 5
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(owner=self.request.user)
