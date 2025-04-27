@@ -47,41 +47,60 @@
     {% endif %}
 
     {# body #}
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th scope="col" class="w-100">Título</th>
-            <th scope="col" class="col-auto text-nowrap">Propietario</th>
-            <th scope="col" class="col-auto text-nowrap">Ultima modificacion</th>
-            <th scope="col" class="col-auto text-nowrap">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div class="card">
+      <!-- Título de la card con nombres de columnas -->
+      <div class="card-header d-none d-md-block">
+        <div class="row align-items-center">
+          <div class="col-md-5">Título</div>
+          <div class="col-md-3 p-0">Propietario</div>
+          <div class="col-md-3 p-0">Última modificación</div>
+          <div class="col-md-1 p-0">Acciones</div>
+        </div>
+      </div>
+      
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
           {% for project in projects %}
-            <tr> {# agregar link a href=" #} 
-              <td class="w-100" onclick="window.location='{% url 'list_goals' project.id %}';" style="cursor: pointer;">{{ project.name }}</td>
-              <td class="col-auto text-nowrap">{{ project.owner.get_full_name|default:project.owner.username }}</td>
-              <td class="col-auto text-nowrap">{{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}</td>
-
-              <td class="col-auto text-nowrap">
-                {% if not project.is_archived %}
-                  {# No se puede eliminar parcialmente #}
-                  <button class="btn btn-link btn-sm border-0" data-bs-toggle="modal" data-bs-target="#archiveModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}"><i class="bi bi-archive"></i></button>
-                {% endif %}
-
-                {% if project.is_archived %}
-                  {# eliminar permanentemente #}
-                  <button class="btn btn-link btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}"><i class="bi bi-trash"></i></button>
-                {% endif %}
-              </td>
-            </tr>
+            <li class="list-group-item list-group-item-action">
+              <div class="d-flex flex-column flex-md-row align-items-md-center w-100">
+                <!-- Columna 1: Título y fecha (móvil) -->
+                <div class="col-md-5 pe-2 mb-2 mb-md-0" onclick="window.location='{% url 'list_goals' project.id %}';" style="cursor: pointer;">
+                  <div class="">{{ project.name }}</div>
+                </div>
+                
+                <!-- Columna 2: Propietario -->
+                <div class="col-md-3 pe-2 mb-2 mb-md-0">
+                  <span class="d-md-none text-muted">Propietario: </span>
+                  {{ project.owner.get_full_name|default:project.owner.username }}
+                </div>
+                
+                <!-- Columna 3: Última modificación (solo desktop) -->
+                <div class="col-md-3 pe-2 mb-2 mb-md-0 d-none d-md-block">
+                  {{ project.last_modified|date:'SHORT_DATETIME_FORMAT' }}
+                </div>
+                
+                <!-- Columna 4: Acciones -->
+                <div class="col-md-1 text-md-end">
+                  {% if not project.is_archived %}
+                    <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#archiveModal" 
+                            data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}" title="Archivar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  {% endif %}
+                  
+                  {% if project.is_archived %}
+                    <button class="btn btn-outline-danger btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                            data-bs-project-id="{{ project.id }}" data-bs-project-name="{{ project.name }}" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
           {% endfor %}
-        </tbody>
-      </table>
+        </ul>
+      </div>
     </div>
-  </div>
 
-  {% include 'layout/app/shared/Pagination.html' with class="justify-content-center" %}
-
+  {% include 'layout/app/shared/Pagination.html' with class='justify-content-center' %}
 {% endblock %}
