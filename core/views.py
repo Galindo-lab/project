@@ -3,18 +3,20 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db.models import Q
+from django.forms import ValidationError
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from core.forms import ArchiveProjectForm, RegisterForm
+from core.forms import ArchiveProjectForm, GoalForm, RegisterForm
 from core.models import Goal, Project
 
 
@@ -52,9 +54,8 @@ class GoalsListView(LoginRequiredMixin, ListView):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
         
         get_goal_pk = self.request.GET.get("goal_pk")
-        if get_goal_pk:
-            if get_goal_pk != "":
-                return self.project.goal_set.filter(pk=get_goal_pk)
+        if get_goal_pk and get_goal_pk != "":
+            return self.project.goal_set.filter(pk=get_goal_pk)
             
         return Goal.objects.filter(project=self.project)
     
@@ -64,7 +65,51 @@ class GoalsListView(LoginRequiredMixin, ListView):
         return context
 
 
+class GoalCreateView(LoginRequiredMixin, CreateView):
+    model = Goal
+    fields = ["name", "description", "completion_percentage"]  # Asegúrate de incluir todos los campos requeridos
+    
+    def get_success_url(self):
+        project_id = self.request.POST.get('project_pk')
+        if not project_id:
+            raise ValidationError("Project ID no encontrado en el formulario")
+        return reverse('list_goals', kwargs={'pk': project_id})
 
+    def form_valid(self, form):
+        project_id = self.request.POST.get('project_pk')
+        if not project_id:
+            messages.error(self.request, "No se especificó el proyecto")
+            return redirect('home')
+            
+        try:
+            # Establece un valor por defecto si completion_percentage no fue proporcionado
+            if not form.cleaned_data.get('completion_percentage'):
+                form.instance.completion_percentage = 0.00  # Valor por defecto
+            
+            form.instance.project_id = project_id
+            form.instance.creation_date = timezone.now()
+            form.instance.last_modified = timezone.now()
+
+            messages.success(
+                self.request,
+                f"Objetivo '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!"
+            )
+            return super().form_valid(form)
+        except Exception as e:
+            messages.error(self.request, f"Error al crear objetivo: {str(e)}")
+            return redirect(reverse('list_goals', kwargs={'pk': project_id}))
+
+    def form_invalid(self, form):
+        project_id = self.request.POST.get('project_pk', '1')  # Fallback a 1 si no existe
+        
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(
+                    self.request,
+                    f"Error en {form.fields[field].label}: {error}"
+                )
+        
+        return redirect(reverse('list_goals', kwargs={'pk': project_id}))
 
 # Vistas de Proyecto
 

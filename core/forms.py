@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from core.models import Project
+from core.models import Goal, Project
 
 from django.utils import timezone
 
@@ -10,7 +10,11 @@ from django.utils import timezone
 class ArchiveProjectForm(forms.Form):
     project_id = forms.IntegerField(widget=forms.HiddenInput())
 
-
+class GoalForm(forms.ModelForm):
+    class Meta:
+        model = Goal
+        fields = ['name', 'description', 'project']
+        
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
