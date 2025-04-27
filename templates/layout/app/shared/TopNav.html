@@ -1,56 +1,50 @@
 <div x-data="{ showSearch: false }" class="bg-body-tertiary">
-    {# Barra de navegación principal #}
-    <nav :class="{'d-none': showSearch}" class="navbar navbar-expand-lg" style="height: 58px;" >
+    <!-- Barra unificada que maneja ambos estados -->
+    <nav class="navbar navbar-expand-lg" style="height: 58px;">
         <div class="container-fluid ps-0">
-            {# Nombres y tabs #}
-            <span class="text-body text-decoration-none ms-2 fw-medium" href="#">
-                <div class="d-none d-lg-flex fs-5">{{ title }}</div>
+            <!-- Contenido normal (se muestra cuando showSearch = false) -->
+            <template x-if="!showSearch">
+                <div class="d-flex w-100 align-items-center">
+                    <span class="text-body text-decoration-none ms-2 fw-medium">
+                        <div class="d-none d-lg-flex fs-5">{{ title }}</div>
+                        
+                        {% if tabs %}
+                        <ul class="nav nav-underline d-none d-lg-flex">
+                            <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-folder me-2"></i>Proyecto</a></li>
+                        </ul>
+                        {% endif %}
 
-                {% if tabs %}
-                <div>
-                    <ul class="nav nav-underline d-none d-lg-flex">
-                        <li class="nav-item">
-                          <a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#"><i class="bi bi-folder me-2"></i>Proyecto</a>
-                          </li>
-                      </ul>
-                </div>
-                {% endif %}
+                        <div class="d-flex d-lg-none fs-5"><i class="bi bi-layout-wtf me-2"></i>ProjectWise</div>
+                    </span>
 
-                <div class="d-flex d-lg-none fs-5">
-                <i class="bi bi-layout-wtf me-2"></i>ProjectWise
-                </div>
-            </span>
-
-            {# boton de buscar #}
-            <form class="d-flex" role="search">
-                <button @click.prevent="showSearch = true" class="btn btn-outline-secondary " type="button">
-                <i class="bi bi-search "></i>
-                </button>
-            </form>
-        </div>
-    </nav>
-
-    {# Barra de busqueda #}
-    <div :class="{'d-none': !showSearch}" class="navbar navbar-expand-lg d-none ms-2" style="height: 58px;" >
-        <div class="container-fluid ps-0" >
-            <form class="d-flex w-100" role="search" method="get" >                
-                <div class="input-group border rounded">
-                    <button type="submit" class="btn btn-outline-secondary border-0">
+                    <button @click="showSearch = true" class="btn btn-outline-secondary ms-auto">
                         <i class="bi bi-search"></i>
                     </button>
-                    <input name="search" type="text" class="form-control shadow-none border-0" placeholder="Buscar..." value="{{request.GET.search}}">
                 </div>
+            </template>
 
-                <button @click.prevent="showSearch = false" class="btn btn-outline-secondary border-0 mx-1" type="button">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </form>
+            <!-- Barra de búsqueda (se muestra cuando showSearch = true) -->
+            <template x-if="showSearch">
+                <div class="d-flex w-100">
+                    <form @submit.prevent="$el.submit()" class="d-flex w-100" method="get">
+                        <div class="input-group border rounded flex-grow-1">
+                            <button type="submit" class="btn btn-outline-secondary border-0">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <input name="search" type="text" class="form-control shadow-none border-0" 
+                                   placeholder="Buscar..." value="{{request.GET.search}}" x-ref="searchInput"
+                                   @focus="if($el.value === '') $el.value = ' '">
+                        </div>
+
+                        <button @click="showSearch = false; $refs.searchInput.value = ''" 
+                                class="btn btn-outline-secondary border-0 ms-1" type="button">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </form>
+                </div>
+            </template>
         </div>
-    </div>
+    </nav>
 </div>
