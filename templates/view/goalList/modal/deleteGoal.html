@@ -1,0 +1,37 @@
+<div 
+  class="modal fade" 
+  id="{{ id }}" 
+  x-data="{ goalId: '', goalName: '' }"
+  x-init="
+    $el.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      goalId = button?.getAttribute('data-bs-goal-id') || '';
+      goalName = button?.getAttribute('data-bs-goal-name') || '';
+    });
+  ">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="goal_id" :value="goalId">
+        <div class="modal-body">
+          <p>
+            ¿Estás seguro que deseas eliminar la meta 
+            <strong x-text="goalName"></strong>?
+          </p>
+          <p class="text-muted">Esta acción no se puede deshacer y todos los datos asociados se perderán permanentemente.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Eliminar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

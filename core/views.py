@@ -1,4 +1,5 @@
 import json
+import requests
 from urllib.parse import urlencode
 
 from django.contrib import messages
@@ -16,9 +17,9 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from core.forms import ArchiveProjectForm, GoalForm, RegisterForm
-from core.models import Goal, Project
-
+from .forms import ArchiveProjectForm, GoalForm, RegisterForm
+from .models import Goal, Project
+from .llmshet import GeminiShet
 
 @login_required
 def index(request):
@@ -73,9 +74,12 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
         return reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
 
     def form_valid(self, form):
+        gemini = GeminiShet()
+        a = gemini.generate_content("Siguiendo exactamente sin listas ni bold el siguiente formato dame una lista de 10 metas de un proyecto de desarrollo de software: nombre|descripcion-")
+        
         messages.success(
             self.request,
-            f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!",
+            f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente! {a}",
         )
         return super().form_valid(form)
 
