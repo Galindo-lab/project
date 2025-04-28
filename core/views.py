@@ -67,29 +67,17 @@ class GoalsListView(LoginRequiredMixin, ListView):
 
 class GoalCreateView(LoginRequiredMixin, CreateView):
     model = Goal
-    fields = [
-        "name",
-        "description",
-        "project",
-        "completion_percentage",
-    ]  
+    fields = ["name", "description", "project", "completion_percentage"]
 
     def get_success_url(self):
         return reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
 
     def form_valid(self, form):
-        try:
-            messages.success(
-                self.request,
-                f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!",
-            )
-            return super().form_valid(form)
-
-        except Exception as e:
-            messages.error(self.request, f"Error al crear objetivo: {str(e)}")
-        return redirect(
-            reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
+        messages.success(
+            self.request,
+            f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!",
         )
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         for field, errors in form.errors.items():
@@ -98,7 +86,9 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
                     self.request, f"Error en {form.fields[field].label}: {error}"
                 )
 
-        return redirect(reverse("list_goals", kwargs={"pk": self.request.POST.get("project")}))
+        return redirect(
+            reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
+        )
 
 
 # Vistas de Proyecto
