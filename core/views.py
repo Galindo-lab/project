@@ -91,9 +91,9 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
         )
 
 
+
+
 # Vistas de Proyecto
-
-
 class ProjectEditView(LoginRequiredMixin, UpdateView):
     model = Project
     fields = ["name", "description", "is_archived"]
