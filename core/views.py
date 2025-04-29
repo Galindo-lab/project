@@ -64,6 +64,42 @@ class GoalsListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["project"] = self.project
         return context
+    
+
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.urls import reverse
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class GoalUpdateView(LoginRequiredMixin, UpdateView):
+    model = Goal
+    fields = ["name", "description"]
+    
+    def get_object(self):
+        goal_id = self.request.POST.get('id')  
+        project_id = self.kwargs.get('pk')
+        return get_object_or_404(Goal, pk=goal_id, project__id=project_id)
+
+    def get_success_url(self):
+        return reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")})
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            f"Meta '{form.cleaned_data.get('name')}' actualizada correctamente!",
+        )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(
+                    self.request, 
+                    f"Error en {form.fields[field].label}: {error}"
+                )
+        return redirect(self.get_success_url())    
+    
 
 
 class GoalDeleteView(LoginRequiredMixin, View):

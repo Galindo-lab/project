@@ -1,0 +1,58 @@
+<div 
+  class="modal fade" 
+  id="{{ id }}" 
+  x-data="{
+    goalId: '',
+    goalName: '',
+    goalDescription: '',
+  }"
+  x-init="
+    $el.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      goalId = button?.getAttribute('data-bs-goal-id') || '';
+      goalName = button?.getAttribute('data-bs-goal-name') || '';
+      goalDescription = button?.getAttribute('data-bs-goal-description') || '';
+    });
+  ">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Meta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'update_goal' pk=project.id %}">
+        {% csrf_token %}
+        <input type="text" name="id" :value="goalId">
+        
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="goalName" class="form-label">Nombre de la meta</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="goalName" 
+              name="name" 
+              x-model="goalName"
+              required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="goalDescription" class="form-label">Descripción</label>
+            <textarea 
+              class="form-control" 
+              id="goalDescription" 
+              name="description" 
+              x-model="goalDescription"></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Guardar cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
