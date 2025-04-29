@@ -1,5 +1,7 @@
 import requests
 
+from .models import Goal, Project
+
 class GeminiShet:
     _instance = None
     _api_key = "AIzaSyA2bqlJht5G0DOJcdfXPMnb4euwdlyz7qg"  # Key hardcodeada
@@ -53,6 +55,23 @@ class GeminiShet:
         except requests.exceptions.RequestException as e:
             print(f"Error al conectar con la API de Gemini: {e}")
             return None
+
+
+
+class GeminiGenerator:
+    def generate_goal(self, proyect:Project, context:str) -> Goal:
+        gemini = GeminiShet()
+        response = gemini.generate_content(context)
+        
+        # Aquí puedes procesar la respuesta y crear una instancia de Goal
+        # Por ejemplo, si la respuesta es un string con el nombre y descripción separados por '|':
+        name, description = response.split('|')
+        
+        goal = Goal(name=name, description=description, project=proyect)    
+        return goal
+
+
+
 
 # Ejemplo de uso
 if __name__ == "__main__":

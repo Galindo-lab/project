@@ -36,7 +36,7 @@ class Collaborator(models.Model):
 class Goal(models.Model):  # formerly "Meta"
     name = models.CharField(max_length=100)
     description = models.TextField()
-    completion_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    completion_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, default=0.0)
 
     def __str__(self):

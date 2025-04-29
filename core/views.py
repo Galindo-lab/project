@@ -19,7 +19,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import ArchiveProjectForm, GoalForm, RegisterForm
 from .models import Goal, Project
-from .llmshet import GeminiShet
+from .llmshet import GeminiShet, GeminiGenerator
 
 @login_required
 def index(request):
@@ -74,13 +74,22 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
         return reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
 
     def form_valid(self, form):
-        gemini = GeminiShet()
-        a = gemini.generate_content("Siguiendo exactamente sin listas ni bold el siguiente formato dame una lista de 10 metas de un proyecto de desarrollo de software: nombre|descripcion-")
+        
+        project = get_object_or_404(Project, pk=form.cleaned_data.get("project").pk)
+        
+        gemini = GeminiGenerator()
+        goal = gemini.generate_goal(
+            proyect=project,
+            context="Siguiendo exactamente este formato \"nombre|descripcion\" sin texto adicional, sin listas, ni bold, dame una lista de 1 metas de un proyecto de desarrollo de software: ",
+        )
+        
+        goal.save()
         
         messages.success(
             self.request,
-            f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente! {a}",
+            f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!",
         )
+        
         return super().form_valid(form)
 
     def form_invalid(self, form):
