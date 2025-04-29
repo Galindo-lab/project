@@ -7,7 +7,11 @@ from django.db.models import Q
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.urls import reverse
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -20,6 +24,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ArchiveProjectForm, GoalForm, RegisterForm
 from .models import Goal, Project
 from .llmshet import GeminiShet, GeminiGenerator
+
 
 @login_required
 def index(request):
@@ -64,21 +69,15 @@ class GoalsListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["project"] = self.project
         return context
-    
 
-from django.shortcuts import get_object_or_404
-from django.contrib import messages
-from django.urls import reverse
-from django.views.generic.edit import UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 class GoalUpdateView(LoginRequiredMixin, UpdateView):
     model = Goal
     fields = ["name", "description"]
-    
+
     def get_object(self):
-        goal_id = self.request.POST.get('id')  
-        project_id = self.kwargs.get('pk')
+        goal_id = self.request.POST.get("id")
+        project_id = self.kwargs.get("pk")
         return get_object_or_404(Goal, pk=goal_id, project__id=project_id)
 
     def get_success_url(self):
@@ -95,11 +94,9 @@ class GoalUpdateView(LoginRequiredMixin, UpdateView):
         for field, errors in form.errors.items():
             for error in errors:
                 messages.error(
-                    self.request, 
-                    f"Error en {form.fields[field].label}: {error}"
+                    self.request, f"Error en {form.fields[field].label}: {error}"
                 )
-        return redirect(self.get_success_url())    
-    
+        return redirect(self.get_success_url())
 
 
 class GoalDeleteView(LoginRequiredMixin, View):
@@ -107,32 +104,31 @@ class GoalDeleteView(LoginRequiredMixin, View):
     Vista para eliminar una meta (Goal).
     La URL incluye el project_id como pk y el goal_id debe venir por POST.
     """
-    
+
     def post(self, request, pk, *args, **kwargs):
         try:
             goal_id = request.POST.get("goal_id")
-            
+
             if not goal_id:
                 messages.error(request, "Falta el ID de la meta a eliminar.")
                 return redirect("home")
-            
+
             project = get_object_or_404(Project, id=pk)
             goal = get_object_or_404(Goal, id=goal_id, project=project)
-            
+
             goal.delete()
-            
+
             messages.success(request, "¡Meta eliminada correctamente!")
         except Exception as e:
             messages.error(request, f"Error al eliminar la meta: {str(e)}")
-            
-        
+
         return redirect(reverse("list_goals", kwargs={"pk": pk}))
 
 
 class GoalCreateView(LoginRequiredMixin, CreateView):
     model = Goal
     fields = ["name", "description"]
-    
+
     def get_success_url(self):
         return reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")})
 
@@ -140,12 +136,12 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
         # Asignar automáticamente el proyecto desde la URL
         project = get_object_or_404(Project, pk=self.kwargs.get("pk"))
         form.instance.project = project
-        
+
         messages.success(
             self.request,
             f"Meta '{form.cleaned_data.get('name', 'nuevo objetivo')}' creado correctamente!",
         )
-        
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -155,10 +151,7 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
                     self.request, f"Error en {form.fields[field].label}: {error}"
                 )
 
-        return redirect(
-            reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")})
-        )
-
+        return redirect(reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")}))
 
 
 # Vistas de Proyecto
