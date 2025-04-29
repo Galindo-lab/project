@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import ListView, CreateView, FormView, UpdateView
+from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import ArchiveProjectForm, GoalForm, RegisterForm
@@ -66,24 +66,44 @@ class GoalsListView(LoginRequiredMixin, ListView):
         return context
 
 
+class GoalDeleteView(LoginRequiredMixin, View):
+    """
+    Vista para eliminar una meta (Goal).
+    La URL incluye el project_id como pk y el goal_id debe venir por POST.
+    """
+    
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            goal_id = request.POST.get("goal_id")
+            
+            if not goal_id:
+                messages.error(request, "Falta el ID de la meta a eliminar.")
+                return redirect("home")
+            
+            project = get_object_or_404(Project, id=pk)
+            goal = get_object_or_404(Goal, id=goal_id, project=project)
+            
+            goal.delete()
+            
+            messages.success(request, "¡Meta eliminada correctamente!")
+        except Exception as e:
+            messages.error(request, f"Error al eliminar la meta: {str(e)}")
+            
+        
+        return redirect(reverse("list_goals", kwargs={"pk": pk}))
+
+
 class GoalCreateView(LoginRequiredMixin, CreateView):
     model = Goal
-    fields = ["name", "description", "project", "completion_percentage"]
-
+    fields = ["name", "description"]
+    
     def get_success_url(self):
-        return reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
+        return reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")})
 
     def form_valid(self, form):
-        
-        project = get_object_or_404(Project, pk=form.cleaned_data.get("project").pk)
-        
-        gemini = GeminiGenerator()
-        goal = gemini.generate_goal(
-            proyect=project,
-            context="Siguiendo exactamente este formato \"nombre|descripcion\" sin texto adicional, sin listas, ni bold, dame una lista de 1 metas de un proyecto de desarrollo de software: ",
-        )
-        
-        goal.save()
+        # Asignar automáticamente el proyecto desde la URL
+        project = get_object_or_404(Project, pk=self.kwargs.get("pk"))
+        form.instance.project = project
         
         messages.success(
             self.request,
@@ -100,9 +120,8 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
                 )
 
         return redirect(
-            reverse("list_goals", kwargs={"pk": self.request.POST.get("project")})
+            reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")})
         )
-
 
 
 

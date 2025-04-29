@@ -5,12 +5,9 @@
         <h5 class="modal-title" id="createGoalModalLabel">Crear Nueva Meta</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="post" action="{% url 'create_goal' %}">
+      <form method="post" action="{% url 'create_goal' pk=project.pk %}">
         <div class="modal-body">
           {% csrf_token %}
-          <input type="hidden" name="project" value="{{ project.pk }}" />
-          <input type="hidden" name="completion_percentage" value="0.00" />
-          
           <div class="mb-3">
             <label for="goalName" class="form-label">Nombre de la Meta</label>
             <input type="text" class="form-control" id="goalName" name="name" required maxlength="100" />
