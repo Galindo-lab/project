@@ -7,6 +7,11 @@ from core.models import Goal, Project
 from django.utils import timezone
 
 
+class ProjectEditForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['name', 'description']
+
 class ArchiveProjectForm(forms.Form):
     project_id = forms.IntegerField(widget=forms.HiddenInput())
 

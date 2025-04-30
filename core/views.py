@@ -21,7 +21,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, GoalForm, RegisterForm
+from .forms import ArchiveProjectForm, GoalForm, ProjectEditForm, RegisterForm
 from .models import Goal, Project
 from .llmshet import GeminiShet, GeminiGenerator
 
@@ -155,35 +155,29 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
 
 
 # Vistas de Proyecto
-class ProjectEditView(LoginRequiredMixin, UpdateView):
-    model = Project
-    fields = ["name", "description", "is_archived"]
-    template_name = "view/proyectEdit/main.html"
-    success_url = reverse_lazy("home")
 
-    def get_object(self, queryset=None):
-        project = super().get_object(queryset)
-        if self.request.user != project.owner:
-            raise PermissionDenied("No tienes permiso para editar este proyecto")
-        return project
 
-    def form_valid(self, form):
-        form.instance.last_modified = timezone.now()
+class ProjectEditView(LoginRequiredMixin, View):
+    template_name = "view/proyectDetails.html"
 
-        project_name = form.cleaned_data.get("name", "proyecto")
-        messages.success(
-            self.request, f"Proyecto '{project_name}' actualizado correctamente!"
-        )
+    def get(self, request, pk):
+        project = get_object_or_404(Project, pk=pk, owner=request.user)
+        form = ProjectEditForm(instance=project)
+        context = {"form": form, "project": project}
+        return render(request, self.template_name, context)
 
-        return super().form_valid(form)
+    def post(self, request, pk):
+        project = get_object_or_404(Project, pk=pk, owner=request.user)
+        form = ProjectEditForm(request.POST, instance=project)
 
-    def form_invalid(self, form):
-        for field, errors in form.errors.items():
-            for error in errors:
-                messages.error(
-                    self.request, f"Error en '{form.fields[field].label}': {error}"
-                )
-        return super().form_invalid(form)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.last_modified = timezone.now()
+            project.save()
+            messages.success(request, "Proyecto actualizado correctamente")
+
+        context = {"form": form, "project": project}
+        return render(request, self.template_name, context)
 
 
 class DeleteProjectView(LoginRequiredMixin, FormView):

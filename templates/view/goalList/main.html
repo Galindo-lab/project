@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block main %}
-  {% include 'layout/app/shared/TopNav.html' with tabs='true' title=project.name %}
+  {% include 'layout/app/shared/TopNav.html' with tasksTab="active" title=project.name %}
 
   <div class="overflow-auto p-2" style="height: 100dvh;">
     {% if request.GET.search %}

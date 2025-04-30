@@ -9,11 +9,11 @@
                         <div class="d-none d-lg-flex justify-content-end align-items-center">
                             <div class="fs-5 me-3 fw-bold">{{ title }}</div> 
                             
-                            {% if tabs %}
+                            {% if project %}
                             <ul class="nav nav-underline">
-                                <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i>Tareas</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Recursos</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-folder me-2"></i>Proyecto</a></li>
+                                <li class="nav-item"><a class="nav-link {{ tasksTab }}" href="{% url 'list_goals' pk=project.pk %}"><i class="bi bi-list-task me-2"></i>Tareas</a></li>
+                                <li class="nav-item"><a class="nav-link {{ resourcesTab }}" href="#"><i class="bi bi-collection me-2"></i>Recursos</a></li>
+                                <li class="nav-item"><a class="nav-link {{ projectTab }}" href="{% url 'details_project' pk=project.pk %}"><i class="bi bi-folder me-2"></i>Proyecto</a></li>
                             </ul>
                             {% endif %}
                         </div>
