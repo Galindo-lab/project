@@ -1,0 +1,16 @@
+Genera exactamente una meta para un proyecto, siguiendo ESTE FORMATO (sin listas, negritas, títulos o texto adicional):
+
+<<nombre de la meta>>|<<descripción de la meta>>
+
+**Contexto del proyecto:**
+- **descripción:** {{project.description}}
+
+{% for goal in project.goal_set.all %}
+**Metas del proyecto:**
+- {{ goal.name }}: {{ goal.description }}{% if goal.pk == pk %}Cambia esta meta para que tenga sentido siguiendo la secuencia del proyecto{% endif %}
+{% endfor %}
+
+**Reglas estrictas:**
+1. La salida debe ser ÚNICAMENTE una línea con el formato <<nombre>>|<<descripción>>.
+2. Usa el "|" como separador y nunca incluyas saltos de línea, puntos adicionales o otros símbolos.
+3. Si no hay datos, usa: `Meta genérica|Optimizar procesos clave del proyecto`.

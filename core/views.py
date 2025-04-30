@@ -1,11 +1,7 @@
-import json
-import requests
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db.models import Q
-from django.forms import ValidationError
-from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
@@ -15,13 +11,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import ListView, CreateView, FormView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, GoalForm, ProjectEditForm, RegisterForm
+from .forms import ArchiveProjectForm, ProjectEditForm, RegisterForm
 from .models import Goal, Project
 from .llmshet import GeminiShet, GeminiGenerator
 
@@ -153,10 +148,24 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
 
         return redirect(reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")}))
 
+class GoalGenerateView(LoginRequiredMixin, View):
+    def get(self, request, pk, goalpk):
+        project = get_object_or_404(Project, pk=pk)
+        goal = get_object_or_404(Goal, pk=goalpk, project=project)
+
+        # Generar el contenido de la meta utilizando GeminiShet
+        generator = GeminiGenerator()
+        goal2 = generator.generate_goal(project, project.description, goalpk)
+        
+        goal.name = goal2.name
+        goal.description = goal2.description
+        
+        goal.save()
+
+        messages.success(request, "Contenido generado correctamente!")
+        return redirect(reverse("list_goals", kwargs={"pk": pk}))
 
 # Vistas de Proyecto
-
-
 class ProjectEditView(LoginRequiredMixin, View):
     template_name = "view/proyectDetails.html"
 
@@ -206,6 +215,7 @@ class ArchiveProjectView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         project_id = form.cleaned_data["project_id"]
+
         try:
             project = Project.objects.get(pk=project_id)
             project.is_archived = True

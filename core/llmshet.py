@@ -1,3 +1,5 @@
+from django.template.loader import render_to_string
+from django.shortcuts import render
 import requests
 
 from .models import Goal, Project
@@ -59,9 +61,19 @@ class GeminiShet:
 
 
 class GeminiGenerator:
-    def generate_goal(self, proyect:Project, context:str) -> Goal:
+    def generate_goal(self, proyect:Project, context:str, pk:int) -> Goal:
         gemini = GeminiShet()
-        response = gemini.generate_content(context)
+        
+        prompt = render_to_string("prompts/generate_goal.txt", {
+            "project": proyect,
+            "pk": pk
+        })
+        
+        print(prompt)        
+        
+        response = gemini.generate_content(prompt)
+        
+        print(response)
         
         # Aquí puedes procesar la respuesta y crear una instancia de Goal
         # Por ejemplo, si la respuesta es un string con el nombre y descripción separados por '|':
