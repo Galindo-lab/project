@@ -18,13 +18,13 @@ urlpatterns = [
     path('project/archive/', ArchiveProjectView.as_view(), name='archive_project'),
     path('project/<int:pk>/details/', ProjectEditView.as_view(), name='details_project'),
     
+    # goals     
     path('project/<int:pk>/', GoalsListView.as_view(), name='list_goals'),
     path('project/<int:pk>/goal/create', GoalCreateView.as_view(), name='create_goal'),
     path('project/<int:pk>/goal/delete', GoalDeleteView.as_view(), name='delete_goal'),
     path('project/<int:pk>/goal/update', GoalUpdateView.as_view(), name='update_goal'),
-    
     path('project/<int:pk>/goal/<int:goalpk>/<str:action>', GoalOrderView.as_view(), name='order_goal'),
-    path('generate/<int:pk>/goal/<int:goalpk>/', GoalGenerateView.as_view(), name='generate_goal'),
+    path('project/<int:pk>/generategoal/<int:goalpk>/', GoalGenerateView.as_view(), name='generate_goal'),
     
     # Login
     path('login/', auth_views.LoginView.as_view(template_name='view/login.html'), name='login'),

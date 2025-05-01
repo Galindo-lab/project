@@ -36,7 +36,7 @@
         <div class="card-header {% if not request.GET.goal_pk %}border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
             <div>
-              <span class="fw-bold mb-0">{{ goal.name }}</span>
+              <span class="fw-bold mb-0">{{ goal.order }} - {{ goal.name }}</span>
             </div>
             {# Barra de progreso movida aquí y oculta en móvil #}
             <div class="d-none d-md-block">

@@ -42,7 +42,7 @@ class Goal(models.Model):  # formerly "Meta"
     
     def save(self, *args, **kwargs):
         if self.order is None:
-            last_goal = Goal.objects.filter(project=self.project).order_by('order').first()
+            last_goal = Goal.objects.filter(project=self.project).order_by('-order').first()
             if last_goal:
                 self.order = last_goal.order + 1
             else:
