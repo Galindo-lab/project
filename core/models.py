@@ -38,6 +38,17 @@ class Goal(models.Model):  # formerly "Meta"
     description = models.TextField()
     completion_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, default=0.0)
+    order = models.IntegerField(blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+        if self.order is None:
+            last_goal = Goal.objects.filter(project=self.project).order_by('order').first()
+            if last_goal:
+                self.order = last_goal.order + 1
+            else:
+                self.order = 0
+                
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

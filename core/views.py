@@ -18,7 +18,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import ArchiveProjectForm, ProjectEditForm, RegisterForm
 from .models import Goal, Project
-from .llmshet import GeminiShet, GeminiGenerator
+from .generators import GeminiGenerator
 
 
 @login_required
@@ -58,12 +58,18 @@ class GoalsListView(LoginRequiredMixin, ListView):
         if get_goal_pk and get_goal_pk != "":
             return self.project.goal_set.filter(pk=get_goal_pk)
 
-        return Goal.objects.filter(project=self.project)
+        return Goal.objects.filter(project=self.project).order_by("order")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["project"] = self.project
         return context
+
+
+class GoalOrderView(LoginRequiredMixin, View):
+    def get(self, request, pk, goalpk, action):
+        
+        return redirect(reverse("list_goals", kwargs={"pk": pk}))
 
 
 class GoalUpdateView(LoginRequiredMixin, UpdateView):
@@ -148,22 +154,24 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
 
         return redirect(reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")}))
 
+
 class GoalGenerateView(LoginRequiredMixin, View):
-    def get(self, request, pk, goalpk):
+    def get(self, request, pk, goalpk, *args, **kwargs):
         project = get_object_or_404(Project, pk=pk)
         goal = get_object_or_404(Goal, pk=goalpk, project=project)
 
-        # Generar el contenido de la meta utilizando GeminiShet
-        generator = GeminiGenerator()
-        goal2 = generator.generate_goal(project, project.description, goalpk)
+        gg = GeminiGenerator()
+        goal2 = gg.generate_goal(project, project.description, goalpk)
         
+        print(goal2)
+
         goal.name = goal2.name
         goal.description = goal2.description
-        
         goal.save()
 
         messages.success(request, "Contenido generado correctamente!")
-        return redirect(reverse("list_goals", kwargs={"pk": pk}))
+        return redirect(f"{reverse('list_goals', kwargs={'pk': pk})}?goal_pk={goal.pk}")
+
 
 # Vistas de Proyecto
 class ProjectEditView(LoginRequiredMixin, View):
