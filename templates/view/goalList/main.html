@@ -36,7 +36,9 @@
         <div class="card-header {% if not request.GET.goal_pk %}border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
             <div>
-              <span class="fw-bold mb-0">{{ goal.order }} - {{ goal.name }}</span>
+              <a href="?goal_pk={{goal.pk}}" class="mb-0 link-underline fw-medium link-underline-opacity-0">
+              {{ goal.name }}
+              </a>
             </div>
             {# Barra de progreso movida aquí y oculta en móvil #}
             <div class="d-none d-md-block">
@@ -47,10 +49,10 @@
 
               {% if request.GET.goal_pk %}
                 <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-plus-lg"></i></button>
-
-                {# editar #}
-                <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
               {% endif %}
+
+              {# editar #}
+              <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
 
               {# delete #}
               <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal" data-bs-goal-id="{{ goal.pk }}" data-bs-goal-name="{{ goal.name }}"><i class="bi bi-trash"></i></button>

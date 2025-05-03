@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db.models import Q
+from django.db import transaction
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
@@ -68,40 +69,41 @@ class GoalsListView(LoginRequiredMixin, ListView):
 
 class GoalOrderView(LoginRequiredMixin, View):
     def get(self, request, pk, goalpk, action):
-        try:
-            current_goal = Goal.objects.get(pk=goalpk, project__pk=pk)
-        except Goal.DoesNotExist:
-            messages.error(request, "Objetivo no encontrado.")
-            return redirect(reverse("list_goals", kwargs={"pk": pk}))
+        current_goal = get_object_or_404(Goal, pk=goalpk, project__pk=pk)
         
         # Obtenemos todos los objetivos ordenados del proyecto
         goals = list(Goal.objects.filter(project=current_goal.project).order_by('order'))
         current_index = next((i for i, g in enumerate(goals) if g.pk == current_goal.pk), None)
 
-        if current_index is None:
-            messages.error(request, "Error en el ordenamiento.")
-            return redirect(reverse("list_goals", kwargs={"pk": pk}))
-        
         with transaction.atomic():
-            if action == "up" and current_index > 0:
-                # Intercambiar con el anterior
-                previous_goal = goals[current_index - 1]
-                current_goal.order, previous_goal.order = previous_goal.order, current_goal.order
-                current_goal.save()
-                previous_goal.save()
-                
-            elif action == "down" and current_index < len(goals) - 1:
-                # Intercambiar con el siguiente
-                next_goal = goals[current_index + 1]
-                current_goal.order, next_goal.order = next_goal.order, current_goal.order
-                current_goal.save()
-                next_goal.save()
-                
+            if action == "up":
+                self._move_up(current_goal, goals, current_index, request)
+            elif action == "down":
+                self._move_down(current_goal, goals, current_index, request)
             else:
                 messages.error(request, "Acción no válida o movimiento imposible.")
 
         return redirect(reverse("list_goals", kwargs={"pk": pk}))
 
+    def _move_up(self, current_goal, goals, current_index, request):
+        if current_index > 0:
+            # Intercambiar con el anterior
+            previous_goal = goals[current_index - 1]
+            current_goal.order, previous_goal.order = previous_goal.order, current_goal.order
+            current_goal.save()
+            previous_goal.save()
+        else:
+            messages.error(request, "No se puede subir más.")
+
+    def _move_down(self, current_goal, goals, current_index, request):
+        if current_index < len(goals) - 1:
+            # Intercambiar con el siguiente
+            next_goal = goals[current_index + 1]
+            current_goal.order, next_goal.order = next_goal.order, current_goal.order
+            current_goal.save()
+            next_goal.save()
+        else:
+            messages.error(request, "No se puede bajar más.")
 
 class GoalUpdateView(LoginRequiredMixin, UpdateView):
     model = Goal
