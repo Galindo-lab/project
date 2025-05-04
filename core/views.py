@@ -17,7 +17,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, CreateTaskForm, ProjectEditForm, RegisterForm
+from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm
 from .models import Goal, Project, Resource
 from .generators import GeminiGenerator
 
@@ -47,28 +47,47 @@ def register(request):
 
 
 # Vistas de Recursos
+class ResourceCreateView(LoginRequiredMixin, View):
+    def post(self, request, project_pk, *args, **kwargs):
+        project = get_object_or_404(Project, pk=project_pk)
+        
+        # URL de redirección
+        redirect_url = reverse("resources", kwargs={"project_pk": project.pk})
+        
+        resource_form = CreateResourceForm(request.POST)
+        if resource_form.is_valid():
+            resource = resource_form.save(commit=False)
+            resource.project = project
+            resource.save()
+            messages.success(request, "Recurso creado correctamente!")
+            return redirect(redirect_url)
+        
+        messages.error(request, "Error al crear el recurso. Por favor, verifica los datos ingresados.")
+        return redirect(redirect_url)
+    
+
 class ResourcesListView(LoginRequiredMixin, ListView):
     model = Resource
-    template_name = "view/resourcesList.html"
+    template_name = "view/resourcesList/main.html"
     context_object_name = "resources"
     paginate_by = 10
-    
+
     def get_queryset(self):
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
         search_query = self.request.GET.get("search", "").strip()
-        
+
         if search_query:
             return project.resource_set.filter(
                 Q(name__icontains=search_query)
             )
-        
+
         return project.resource_set.all()
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
-        
         context["project"] = project
+        context["resource_type_choices"] = Resource.ResourceType.choices  # Agregar las opciones de tipo de recurso
         return context
     
 

@@ -1,10 +1,49 @@
 {% extends 'layout/app/main.html' %}
 
 {% block modals %}
+<div class="modal fade" id="createResourceModal" tabindex="-1" aria-labelledby="createResourceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createResourceModalLabel">Crear Nuevo Recurso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'create_resource' project_pk=project.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="resourceName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="resourceName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="resourceType" class="form-label">Tipo</label>
+                        <select class="form-select" id="resourceType" name="type" required>
+                            {% for key, value in resource_type_choices %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="resourceCost" class="form-label">Costo por Hora</label>
+                        <input type="number" step="0.01" class="form-control" id="resourceCost" name="cost_per_hour" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block sidebar %}
-  <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
+
+<button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createResourceModal">
+    <i class="bi bi-plus"></i> Nuevo Recurso
+  </button>
+
 {% endblock %}
 
 {% block main %}

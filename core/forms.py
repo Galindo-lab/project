@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from core.models import Goal, Project, Task
+
+from core.models import Goal, Project, Task, Resource
 
 from django.utils import timezone
 
@@ -44,3 +45,9 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ["username", "email", "password1", "password2"]
+
+
+class CreateResourceForm(forms.ModelForm):
+    class Meta:
+        model = Resource
+        fields = ["name", "type", "cost_per_hour"]
