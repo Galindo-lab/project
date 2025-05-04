@@ -27,10 +27,9 @@ class GoalAdmin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('name', 'goal', 'status', 'priority', 'duration_hours', 'deadline')
+    list_display = ('name', 'goal', 'status', 'priority', 'duration_hours')
     list_filter = ('status', 'priority')
     search_fields = ('name', 'description')
-    date_hierarchy = 'deadline'
 
 @admin.register(Resource)
 class ResourceAdmin(admin.ModelAdmin):

@@ -17,7 +17,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, ProjectEditForm, RegisterForm
+from .forms import ArchiveProjectForm, CreateTaskForm, ProjectEditForm, RegisterForm
 from .models import Goal, Project
 from .generators import GeminiGenerator
 
@@ -44,6 +44,32 @@ def register(request):
         "view/register.html",
         {"form": form},
     )
+
+
+
+# Vistas de Tareas
+class TaskCreateView(LoginRequiredMixin, View):
+    def post(self, request, goal_pk, *args, **kwargs):
+        goal = get_object_or_404(Goal, pk=goal_pk)
+        project = get_object_or_404(Project, pk=goal.project.pk)
+        
+        # url de redirección
+        redirect_url = reverse("list_goals", kwargs={"pk": project.pk})
+        # si hay un goal_pk en la url, lo añadimos como parámetro
+        redirect_url += f"?goal_pk={goal_pk}"
+        
+        task_form = CreateTaskForm(request.POST)
+        if task_form.is_valid():
+            task = task_form.save(commit=False)
+            task.goal = goal
+            task.save()
+            messages.success(request, "Tarea creada correctamente!")
+            return redirect(redirect_url)
+        
+        messages.error(request, "Error al crear la tarea.")
+        return redirect(redirect_url)
+        
+
 
 
 # Vistas de Objetivos
@@ -104,6 +130,7 @@ class GoalOrderView(LoginRequiredMixin, View):
             next_goal.save()
         else:
             messages.error(request, "No se puede bajar más.")
+
 
 class GoalUpdateView(LoginRequiredMixin, UpdateView):
     model = Goal

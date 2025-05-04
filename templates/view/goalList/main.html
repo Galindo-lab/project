@@ -2,9 +2,16 @@
 
 {% block modals %}
   {% include 'layout/app/shared/Messages.html' %}
-  {% include 'view/goalList/modal/createGoal.html' with id='createGoalModal' %}
+
   {% include 'view/goalList/modal/deleteGoal.html' with id='deleteGoalModal' %}
   {% include 'view/goalList/modal/editGoal.html' with id='updateGoalModal' %}
+  {% include 'view/goalList/modal/createGoal.html' with id='createGoalModal' %}
+
+  {% if request.GET.goal_pk %}
+    {% include 'view/goalList/modal/createTask.html' with id='createTask' goal=request.GET.goal_pk %}
+  {% else %}
+
+  {% endif %}
 {% endblock %}
 
 {% block sidebar %}
@@ -22,7 +29,7 @@
 {% endblock %}
 
 {% block main %}
-  {% include 'layout/app/shared/TopNav.html' with tasksTab="active" title=project.name %}
+  {% include 'layout/app/shared/TopNav.html' with tasksTab='active' title=project.name %}
 
   <div class="overflow-auto p-2" style="height: 100dvh;">
     {% if request.GET.search %}
@@ -36,19 +43,18 @@
         <div class="card-header {% if not request.GET.goal_pk %}border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
             <div>
-              <a href="?goal_pk={{goal.pk}}" class="mb-0 link-underline fw-medium link-underline-opacity-0">
-              {{ goal.name }}
-              </a>
+              <a href="?goal_pk={{ goal.pk }}" class="mb-0 link-underline fw-medium link-underline-opacity-0">{{ goal.name }}</a>
             </div>
             {# Barra de progreso movida aquí y oculta en móvil #}
             <div class="d-none d-md-block">
               {% if not request.GET.goal_pk %}
-                <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action="up" %}" class="btn btn-outline-secondary btn-sm border-0" ><i class="bi bi-arrow-up"></i></a>
-                <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action="down" %}" class="btn btn-outline-secondary btn-sm border-0" ><i class="bi bi-arrow-down"></i></a>
+                <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='up' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></a>
+                <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='down' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></a>
               {% endif %}
 
               {% if request.GET.goal_pk %}
-                <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-plus-lg"></i></button>
+                {## Crear tarea #}
+                <button data-bs-toggle="modal" data-bs-target="#createTask" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-plus-lg"></i></button>
               {% endif %}
 
               {# editar #}
@@ -57,11 +63,8 @@
               {# delete #}
               <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal" data-bs-goal-id="{{ goal.pk }}" data-bs-goal-name="{{ goal.name }}"><i class="bi bi-trash"></i></button>
 
-
               {# IA #}
-              <a href="{% url 'generate_goal' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0">
-                <i class="bi bi-stars"></i>
-              </a>
+              <a href="{% url 'generate_goal' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
             </div>
           </div>
         </div>
@@ -69,11 +72,8 @@
         <!-- Lista de tareas flushed -->
         {% if request.GET.goal_pk %}
           <ul class="list-group list-group-flush">
-
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              <p class="small mb-0">
-                {{ goal.description }}
-              </p>
+              <p class="small mb-0">{{ goal.description }}</p>
             </li>
 
             <!-- Primer elemento de ejemplo -->

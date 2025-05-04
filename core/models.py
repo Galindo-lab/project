@@ -70,8 +70,8 @@ class Task(models.Model):
     duration_hours = models.IntegerField() 
     status = models.CharField(max_length=20, choices=Status.choices)
     priority = models.CharField(max_length=10, choices=Priority.choices)
-    creation_date = models.DateTimeField()
-    deadline = models.DateTimeField()
+    creation_date = models.DateTimeField(auto_now_add=True)  
+    update_date = models.DateTimeField(auto_now=True) 
     goal = models.ForeignKey("Goal", on_delete=models.CASCADE)
     dependencies = models.ManyToManyField("self", symmetrical=False, blank=True)
 
