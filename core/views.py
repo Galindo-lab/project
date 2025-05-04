@@ -47,6 +47,8 @@ def register(request):
 
 
 # Vistas de Recursos
+
+
 class ResourceCreateView(LoginRequiredMixin, View):
     def post(self, request, project_pk, *args, **kwargs):
         project = get_object_or_404(Project, pk=project_pk)

@@ -3,20 +3,25 @@
 {% block modals %}
   {% include 'layout/app/shared/Messages.html' %}
 
-  {% include 'view/goalList/modal/deleteGoal.html' with id='deleteGoalModal' %}
-  {% include 'view/goalList/modal/editGoal.html' with id='updateGoalModal' %}
-  {% include 'view/goalList/modal/createGoal.html' with id='createGoalModal' %}
-
   {% if request.GET.goal_pk %}
     {% include 'view/goalList/modal/createTask.html' with id='createTask' goal=request.GET.goal_pk %}
   {% else %}
-
+    {% include 'view/goalList/modal/deleteGoal.html' with id='deleteGoalModal' %}
+    {% include 'view/goalList/modal/editGoal.html' with id='updateGoalModal' %}
+    {% include 'view/goalList/modal/createGoal.html' with id='createGoalModal' %}
   {% endif %}
 {% endblock %}
 
 {% block sidebar %}
-  <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
+  {% if request.GET.goal_pk %}
+    {# Crear tarea #}
+    <button data-bs-toggle="modal" data-bs-target="#createTask" class="btn btn-lg btn-primary w-100 my-2"><i class="bi bi-plus-lg"></i> Crear Tarea</button>
+  {% else %}
+    {# Call to action para crear una nueva meta #}
+    <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
+  {% endif %}
 
+  {# Lista de metas #}
   <div class="my-2 flex-grow-1 overflow-auto">
     <form class="list-group list-group-flush bg-transparent">
       <button type="submit" name="goal_pk" value="" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">Todos</button>
@@ -42,34 +47,31 @@
       <div class="card mb-2">
         <div class="card-header {% if not request.GET.goal_pk %}border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
+            {# Nombre de la meta #}
             <div>
               <a href="?goal_pk={{ goal.pk }}" class="mb-0 link-underline fw-medium link-underline-opacity-0{% if request.GET.goal_pk %} text-body{% endif %}">{{ goal.name }}</a>
             </div>
+
             {# Barra de progreso movida aquí y oculta en móvil #}
             <div class="d-none d-md-block">
               {% if not request.GET.goal_pk %}
                 <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='up' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></a>
                 <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='down' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></a>
+
+                {# editar #}
+                <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
+
+                {# delete #}
+                <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal" data-bs-goal-id="{{ goal.pk }}" data-bs-goal-name="{{ goal.name }}"><i class="bi bi-trash"></i></button>
+
+                {# IA #}
+                <a href="{% url 'generate_goal' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
               {% endif %}
-
-              {% if request.GET.goal_pk %}
-                {# # Crear tarea #}
-                <button data-bs-toggle="modal" data-bs-target="#createTask" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-plus-lg"></i></button>
-              {% endif %}
-
-              {# editar #}
-              <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
-
-              {# delete #}
-              <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal" data-bs-goal-id="{{ goal.pk }}" data-bs-goal-name="{{ goal.name }}"><i class="bi bi-trash"></i></button>
-
-              {# IA #}
-              <a href="{% url 'generate_goal' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
             </div>
           </div>
         </div>
 
-        <!-- Lista de tareas flushed -->
+        {# Lista de tareas flushed #}
         {% if request.GET.goal_pk %}
           <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -77,12 +79,31 @@
             </li>
 
             {% for task in goal.task_set.all %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <span class="fw-semi">{{ task.name }}</span>
-                  <small class="text-muted d-block">{{ task.description }}</small>
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  {# Nombre y descripción de la tarea #}
+                  <div class="flex-grow-1">
+                    <a class="fw-semi mb-0 link-underline fw-medium link-underline-opacity-0">{{ task.name }}</a>
+                    <small class="text-muted d-block">{{ task.description }}</small>
+                  </div>
+
+                  {# Estado #}
+                  <div class="ms-3">
+                    <span class="badge 
+                      {% if task.status == 'pending' %}bg-warning text-dark{% endif %}
+                      {% if task.status == 'in_progress' %}bg-primary{% endif %}
+                      {% if task.status == 'completed' %}bg-success{% endif %}
+                    ">{{ task.get_status_display }}</span>
+                  </div>
+
+                  <div class="ms-2">
+                    {# editar #}
+                    <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
+
+                    {# delete #}
+                    <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal"><i class="bi bi-trash"></i></button>
+                  </div>
                 </div>
-                <span class="badge bg-primary rounded-pill">En progreso</span>
               </li>
             {% endfor %}
           </ul>
