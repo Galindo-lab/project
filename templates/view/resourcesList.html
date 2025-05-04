@@ -1,0 +1,69 @@
+{% extends 'layout/app/main.html' %}
+
+{% block modals %}
+{% endblock %}
+
+{% block sidebar %}
+  <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
+{% endblock %}
+
+{% block main %}
+    {% include 'layout/app/shared/TopNav.html' with resourcesTab="active" title=project.name %}
+
+    <div class="overflow-auto p-2" style="height: 100dvh;">
+        {% include 'layout/app/shared/Messages.html' %}
+
+        {% if request.GET.search %}
+            <div class="ps-2 my-2">
+                <span class="fw-bold">Resultados para: '{{ request.GET.search }}'</span>
+            </div>
+        {% endif %}
+
+        <div class="card mb-3">
+            <!-- Título de la card con nombres de columnas -->
+            <div class="card-header d-none d-md-block">
+                <div class="row align-items-center">
+                    <div class="col-md-4">Nombre</div>
+                    <div class="col-md-3 p-0">Tipo</div>
+                    <div class="col-md-3 p-0">Costo por Hora</div>
+                    <div class="col-md-2 text-end">Acciones</div>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for resource in resources %}
+                        <li class="list-group-item list-group-item-action">
+                            <div class="d-flex flex-column flex-md-row align-items-md-center w-100">
+                                <!-- Columna 1: Nombre -->
+                                <div class="col-md-4 pe-2 mb-2 mb-md-0">
+                                    <a href="?resource_pk={{ resource.pk }}" class="link-underline fw-medium link-underline-opacity-0">
+                                        {{ resource.name }}
+                                    </a>
+                                </div>
+
+                                <!-- Columna 2: Tipo -->
+                                <div class="col-md-3 pe-2 mb-2 mb-md-0">
+                                    {{ resource.get_type_display }}
+                                </div>
+
+                                <!-- Columna 3: Costo por Hora -->
+                                <div class="col-md-3 pe-2 mb-2 mb-md-0">
+                                    {{ resource.cost_per_hour }}
+                                </div>
+
+                                <!-- Columna 4: Acciones -->
+                                <div class="col-md-2 text-md-end">
+                                    <a href="?edit_resource={{ resource.pk }}" class="btn btn-sm btn-warning me-1">Editar</a>
+                                    <a href="?delete_resource={{ resource.pk }}" class="btn btn-sm btn-danger">Eliminar</a>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        {% include 'layout/app/shared/Pagination.html' with class='justify-content-start mt-2 mb-2' %}
+    </div>
+{% endblock %}

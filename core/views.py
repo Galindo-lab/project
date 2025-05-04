@@ -18,7 +18,7 @@ from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import ArchiveProjectForm, CreateTaskForm, ProjectEditForm, RegisterForm
-from .models import Goal, Project
+from .models import Goal, Project, Resource
 from .generators import GeminiGenerator
 
 
@@ -46,6 +46,31 @@ def register(request):
     )
 
 
+# Vistas de Recursos
+class ResourcesListView(LoginRequiredMixin, ListView):
+    model = Resource
+    template_name = "view/resourcesList.html"
+    context_object_name = "resources"
+    paginate_by = 10
+    
+    def get_queryset(self):
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        search_query = self.request.GET.get("search", "").strip()
+        
+        if search_query:
+            return project.resource_set.filter(
+                Q(name__icontains=search_query)
+            )
+        
+        return project.resource_set.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        
+        context["project"] = project
+        return context
+    
 
 # Vistas de Tareas
 class TaskCreateView(LoginRequiredMixin, View):
