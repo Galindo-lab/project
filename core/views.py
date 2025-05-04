@@ -18,7 +18,7 @@ from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm
-from .models import Goal, Project, Resource
+from .models import Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
 
@@ -47,6 +47,16 @@ def register(request):
 
 
 # Vistas de Recursos
+# TODO esto todavia no era
+class ResourceDeleteView(LoginRequiredMixin, View):
+    def post(self, request, project_pk, *args, **kwargs):
+        resource_id = request.POST.get("resource_id")
+        project = get_object_or_404(Project, pk=project_pk)
+        resource = get_object_or_404(Resource, pk=resource_id, project=project)
+
+        resource.delete()
+        messages.success(request, "Recurso eliminado correctamente!")
+        return redirect(reverse("resources", kwargs={"project_pk": project.pk}))
 
 
 class ResourceCreateView(LoginRequiredMixin, View):
@@ -115,7 +125,21 @@ class TaskCreateView(LoginRequiredMixin, View):
         messages.error(request, "Error al crear la tarea.")
         return redirect(redirect_url)
         
-
+class TaskDeleteView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        task_id = request.POST.get("task_id")
+        task = get_object_or_404(Task, pk=task_id)
+        goal = get_object_or_404(Goal, pk=task.goal.pk)
+        project = get_object_or_404(Project, pk=goal.project.pk)
+        
+        # url de redirección
+        redirect_url = reverse("list_goals", kwargs={"pk": project.pk})
+        # si hay un goal_pk en la url, lo añadimos como parámetro
+        redirect_url += f"?goal_pk={goal.pk}"
+        
+        task.delete()
+        messages.success(request, "Tarea eliminada correctamente!")
+        return redirect(redirect_url)
 
 
 # Vistas de Objetivos
