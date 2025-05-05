@@ -105,13 +105,36 @@ class ResourcesListView(LoginRequiredMixin, ListView):
 
 # Vistas de Tareas
 
-class TaskDetailView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        task_id = kwargs.get("task_pk")
-        task = get_object_or_404(Task, pk=task_id)
-        project = get_object_or_404(Project, pk=task.goal.project.pk)
+class TaskDetailView(LoginRequiredMixin, UpdateView):
+    model = Task
+    fields = ["name", "description", "duration_hours", "status", "priority"]
+    template_name = "view/taskDetails.html"
+
+    def get_object(self):
+        task_id = self.kwargs.get("task_pk")
+        return get_object_or_404(Task, pk=task_id)
+
+    def get_success_url(self):
+        task = self.get_object()
+        goal = get_object_or_404(Goal, pk=task.goal.pk)
+        project = get_object_or_404(Project, pk=goal.project.pk)
         
-        return render(request, "view/taskDetail.html", {"task": task, "project": project})
+        messages.success(self.request, "Tarea actualizada correctamente!")
+        
+        # URL de redirección
+        redirect_url = reverse("list_goals", kwargs={"pk": project.pk})
+        redirect_url += f"?goal_pk={goal.pk}"
+        
+        return redirect_url
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        task = self.get_object()
+        goal = get_object_or_404(Goal, pk=task.goal.pk)
+        project = get_object_or_404(Project, pk=goal.project.pk)
+        context["project"] = project
+        return context
+    
 
 class TaskCreateView(LoginRequiredMixin, View):
     def post(self, request, goal_pk, *args, **kwargs):

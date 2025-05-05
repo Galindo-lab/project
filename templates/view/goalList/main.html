@@ -46,7 +46,7 @@
 
     {% for goal in goals %}
       <div class="card mb-2">
-        <div class="card-header {% if not request.GET.goal_pk %}border-0{% endif %}">
+        <div class="card-header{% if not request.GET.goal_pk %} border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
             {# Nombre de la meta #}
             <div>
