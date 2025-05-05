@@ -84,7 +84,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                   {# Nombre y descripción de la tarea #}
                   <div class="flex-grow-1">
-                    <a href="" class="fw-semi mb-0 link-underline fw-medium link-underline-opacity-0">{{ task.name }}</a>
+                    <a href="{% url 'details_task' task_pk=task.pk %}" class="fw-semi mb-0 link-underline fw-medium link-underline-opacity-0">{{ task.name }}</a>
                     <small class="text-muted d-block">{{ task.description }}</small>
                   </div>
 

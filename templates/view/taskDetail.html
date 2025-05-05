@@ -1,0 +1,80 @@
+{% extends 'layout/app/main.html' %}
+
+{% block modals %}
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block main %}
+    {% include 'layout/app/shared/TopNav.html' with tasksTab="active" title=project.name %}
+
+    <div class="overflow-auto p-2" style="height: 100dvh;">
+
+        <div class="" style="max-width: 500px;">
+            <h5>Editar Tarea: {{ task.name }}</h5>
+            <form method="post" >
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="taskName" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="taskName" name="name" value="{{ task.name }}" required>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="taskDuration" class="form-label">Duración (horas)</label>
+                    <input type="number" class="form-control" id="taskDuration" name="duration_hours" value="{{ task.duration_hours }}" min="1" required>
+                </div>
+                <div class="mb-3">
+                    <label for="taskStatus" class="form-label">Estado</label>
+                    <select class="form-select" id="taskStatus" name="status" required>
+                        {% for key, value in task.Status.choices %}
+                            <option value="{{ key }}" {% if task.status == key %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="taskPriority" class="form-label">Prioridad</label>
+                    <select class="form-select" id="taskPriority" name="priority" required>
+                        {% for key, value in task.Priority.choices %}
+                            <option value="{{ key }}" {% if task.priority == key %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+    
+    
+                <div class="mb-3">
+                    <label class="form-label">Recursos Asignados</label>
+                    <div class="form-check">
+                        {% for resource in project.resource_set.all %}
+                            <div class="form-check">
+                                <input 
+                                    class="form-check-input" 
+                                    type="checkbox" 
+                                    id="resource{{ resource.id }}" 
+                                    name="resources" 
+                                    value="{{ resource.id }}" 
+                                    {% if resource in task.resources.all %}checked{% endif %}
+                                >
+                                <label class="form-check-label" for="resource{{ resource.id }}">
+                                    {{ resource.name }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <small class="form-text text-muted">Selecciona los recursos que deseas asignar a esta tarea.</small>
+                </div>
+    
+                <div class="mb-3">
+                    <label for="taskDescription" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="taskDescription" name="description" rows="3" required>{{ task.description }}</textarea>
+                </div>
+    
+    
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <a href="{% url 'list_goals' pk=project.pk %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+
+
+    </div>
+{% endblock %}

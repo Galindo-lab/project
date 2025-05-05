@@ -104,6 +104,15 @@ class ResourcesListView(LoginRequiredMixin, ListView):
     
 
 # Vistas de Tareas
+
+class TaskDetailView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        task_id = kwargs.get("task_pk")
+        task = get_object_or_404(Task, pk=task_id)
+        project = get_object_or_404(Project, pk=task.goal.project.pk)
+        
+        return render(request, "view/taskDetail.html", {"task": task, "project": project})
+
 class TaskCreateView(LoginRequiredMixin, View):
     def post(self, request, goal_pk, *args, **kwargs):
         goal = get_object_or_404(Goal, pk=goal_pk)
