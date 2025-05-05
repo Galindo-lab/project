@@ -4,6 +4,18 @@
 {% endblock %}
 
 {% block sidebar %}
+
+  {# Lista de metas #}
+  <div class="my-2 flex-grow-1 overflow-auto">
+    <div class="list-group list-group-flush bg-transparent">
+      <button type="submit" name="goal_pk" value="" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">Todos</button>
+
+      {% for goal in project.goal_set.all %}
+        <a type="submit" href="{% url 'list_goals' pk=project.pk %}?goal_pk={{goal.pk}}" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">{{ goal.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
 {% endblock %}
 
 {% block main %}
