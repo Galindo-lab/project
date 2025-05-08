@@ -47,7 +47,20 @@ def register(request):
 
 
 # Vistas de Recursos
-# TODO esto todavia no era
+class ResourceEditView(LoginRequiredMixin, View):
+    def post(self, request, project_pk, *args, **kwargs):
+        resource_id = request.POST.get("resource_id")
+        resource = get_object_or_404(Resource, pk=resource_id, project__pk=project_pk)
+
+        resource.name = request.POST.get("name")
+        resource.type = request.POST.get("type")
+        resource.cost_per_hour = request.POST.get("cost_per_hour")
+        resource.save()
+
+        messages.success(request, "Recurso modificado correctamente!")
+        return redirect(reverse("resources", kwargs={"project_pk": project_pk}))
+
+
 class ResourceDeleteView(LoginRequiredMixin, View):
     def post(self, request, project_pk, *args, **kwargs):
         resource_id = request.POST.get("resource_id")

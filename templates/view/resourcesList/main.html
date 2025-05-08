@@ -2,6 +2,7 @@
 
 {% block modals %}
   {% include 'view/resourcesList/modal/deleteResource.html' with id='deleteResourceModal' %}
+  {% include 'view/resourcesList/modal/editResource.html' with id='editResourceModal' %}
 
   <div class="modal fade" id="createResourceModal" tabindex="-1" aria-labelledby="createResourceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -57,7 +58,7 @@
     {% endif %}
 
     <div class="card mb-3">
-      <!-- Título de la card con nombres de columnas -->
+      {# Título de la card con nombres de columnas #}
       <div class="card-header d-none d-md-block">
         <div class="row align-items-center">
           <div class="col-md-4">Nombre</div>
@@ -72,19 +73,20 @@
           {% for resource in resources %}
             <li class="list-group-item list-group-item-action">
               <div class="d-flex flex-column flex-md-row align-items-md-center w-100">
-                <!-- Columna 1: Nombre -->
+                {# Columna 1: Nombre #}
                 <div class="col-md-4 pe-2 mb-2 mb-md-0">
                   <a href="?resource_pk={{ resource.pk }}" class="link-underline fw-medium link-underline-opacity-0">{{ resource.name }}</a>
                 </div>
 
-                <!-- Columna 2: Tipo -->
+                {# Columna 2: Tipo #}
                 <div class="col-md-3 pe-2 mb-2 mb-md-0">{{ resource.get_type_display }}</div>
 
-                <!-- Columna 3: Costo por Hora -->
+                {# Columna 3: Costo por Hora #}
                 <div class="col-md-3 pe-2 mb-2 mb-md-0">{{ resource.cost_per_hour }}</div>
 
-                <!-- Columna 4: Acciones -->
+                {# Columna 4: Acciones #}
                 <div class="col-md-2 text-md-end">
+                  <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#editResourceModal" data-bs-resource-id="{{ resource.pk }}" data-bs-resource-name="{{ resource.name }}" data-bs-resource-type="{{ resource.type }}" data-bs-resource-cost="{{ resource.cost_per_hour }}"><i class="bi bi-pencil"></i></button>
                   <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteResourceModal" data-bs-resource-id="{{ resource.pk }}" data-bs-resource-name="{{ resource.name }}"><i class="bi bi-trash"></i></button>
                 </div>
               </div>

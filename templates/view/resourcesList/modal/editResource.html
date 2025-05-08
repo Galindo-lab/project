@@ -1,0 +1,51 @@
+<div 
+  class="modal fade" 
+  id="{{ id }}" 
+  tabindex="-1" 
+  aria-labelledby="editResourceModalLabel" 
+  aria-hidden="true" 
+  x-data="{ resourceId: '', resourceName: '', resourceType: '', resourceCost: '' }"
+  x-init="
+    $el.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      resourceId = button?.getAttribute('data-bs-resource-id') || '';
+      resourceName = button?.getAttribute('data-bs-resource-name') || '';
+      resourceType = button?.getAttribute('data-bs-resource-type') || '';
+      resourceCost = button?.getAttribute('data-bs-resource-cost') || '';
+    });
+  ">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editResourceModalLabel">Modificar Recurso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'edit_resource' project_pk=project.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="resource_id" :value="resourceId">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editResourceName" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="editResourceName" name="name" :value="resourceName" required />
+          </div>
+          <div class="mb-3">
+            <label for="editResourceType" class="form-label">Tipo</label>
+            <select class="form-select" id="editResourceType" name="type" required>
+              {% for key, value in resource_type_choices %}
+                <option :selected="resourceType === '{{ key }}'" value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editResourceCost" class="form-label">Costo por Hora</label>
+            <input type="number" step="0.01" class="form-control" id="editResourceCost" name="cost_per_hour" :value="resourceCost" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourcesListView, TaskCreateView, TaskDetailView, index, TaskDeleteView, ResourceDeleteView
+from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, index, TaskDeleteView, ResourceDeleteView
 from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, GoalGenerateView, ResourceCreateView
 
 urlpatterns = [
@@ -37,7 +37,7 @@ urlpatterns = [
     path('project/<int:project_pk>/resources/', ResourcesListView.as_view(), name='resources'),
     path('project/<int:project_pk>/resources/create', ResourceCreateView.as_view(), name='create_resource'),
     path('project/<int:project_pk>/resources/delete', ResourceDeleteView.as_view(), name='delete_resource'),
-
+    path('project/<int:project_pk>/resources/edit', ResourceEditView.as_view(), name='edit_resource'),
     
     # Login
     path('login/', auth_views.LoginView.as_view(template_name='view/login.html'), name='login'),
