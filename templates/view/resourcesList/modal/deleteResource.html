@@ -1,0 +1,40 @@
+<div 
+  class="modal fade" 
+  id="{{ id }}" 
+  tabindex="-1" 
+  aria-labelledby="deleteResourceModalLabel" 
+  aria-hidden="true" 
+  x-data="{ resourceId: '', resourceName: '' }"
+  x-init="
+    $el.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      resourceId = button?.getAttribute('data-bs-resource-id') || '';
+      resourceName = button?.getAttribute('data-bs-resource-name') || '';
+    });
+  ">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteResourceModalLabel">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'delete_resource' project_pk=project.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="resource_id" :value="resourceId">
+        <div class="modal-body">
+          <p>
+            ¿Estás seguro que deseas eliminar el recurso 
+            <strong x-text="resourceName"></strong>?
+          </p>
+          <p class="text-muted">Esta acción no se puede deshacer y todos los datos asociados se perderán permanentemente.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Eliminar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
