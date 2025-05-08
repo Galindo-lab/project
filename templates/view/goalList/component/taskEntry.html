@@ -1,0 +1,26 @@
+<li class="list-group-item">
+    <div class="d-flex justify-content-between align-items-center">
+        {# Nombre y descripción de la tarea #}
+        <div class="flex-grow-1">
+        <a href="{% url 'details_task' task_pk=task.pk %}" class="fw-semi mb-0 link-underline fw-medium link-underline-opacity-0">{{ task.name }}</a>
+        <small class="text-muted d-block">{{ task.description }}</small>
+        </div>
+
+        {# Estado #}
+        <div class="ms-3">
+        <span class="badge 
+            {% if task.status == 'pending' %}bg-warning text-dark{% endif %}
+            {% if task.status == 'in_progress' %}bg-primary{% endif %}
+            {% if task.status == 'completed' %}bg-success{% endif %}
+        ">{{ task.get_status_display }}</span>
+        </div>
+
+        <div class="ms-2">
+        {# editar #}
+        <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
+
+        {# delete #}
+        <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteTaskModal" data-bs-task-id="{{ task.pk }}" data-bs-task-name="{{ task.name }}"><i class="bi bi-trash"></i></button>
+        </div>
+    </div>
+</li>
