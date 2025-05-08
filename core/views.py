@@ -135,7 +135,7 @@ class TaskDetailView(LoginRequiredMixin, UpdateView):
         context["project"] = project
         return context
     
-
+    
 class TaskCreateView(LoginRequiredMixin, View):
     def post(self, request, goal_pk, *args, **kwargs):
         goal = get_object_or_404(Goal, pk=goal_pk)
@@ -156,6 +156,7 @@ class TaskCreateView(LoginRequiredMixin, View):
         
         messages.error(request, "Error al crear la tarea.")
         return redirect(redirect_url)
+        
         
 class TaskDeleteView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -182,16 +183,36 @@ class GoalsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
-
+        search_query = self.request.GET.get("search", "").strip()
         get_goal_pk = self.request.GET.get("goal_pk")
-        if get_goal_pk and get_goal_pk != "":
-            return self.project.goal_set.filter(pk=get_goal_pk)
 
-        return Goal.objects.filter(project=self.project).order_by("order")
+        if get_goal_pk and get_goal_pk != "":
+            queryset = self.project.goal_set.filter(pk=get_goal_pk)
+        else:
+            queryset = Goal.objects.filter(project=self.project).order_by("order")
+
+        if search_query:
+            # Filtrar metas que tienen tareas que coinciden con el término de búsqueda
+            queryset = queryset.filter(
+                task__name__icontains=search_query
+            ).distinct()
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["project"] = self.project
+        context["search_query"] = self.request.GET.get("search", "")
+
+        # Filtrar las tareas de cada meta según el término de búsqueda
+        search_query = self.request.GET.get("search", "").strip()
+        if search_query:
+            for goal in context["goals"]:
+                goal.filtered_tasks = goal.task_set.filter(name__icontains=search_query)
+        else:
+            for goal in context["goals"]:
+                goal.filtered_tasks = goal.task_set.all()
+
         return context
 
 
