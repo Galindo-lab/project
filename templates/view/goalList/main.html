@@ -73,7 +73,7 @@
         </div>
 
         {# Lista de tareas flushed #}
-        {% if request.GET.goal_pk %}
+        {% if request.GET.goal_pk or request.GET.search %}
           <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <p class="small mb-0">{{ goal.description }}</p>
