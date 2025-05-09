@@ -1,10 +1,11 @@
 
+import os
 import requests
 
 class GeminiShet:
     _instance = None
-    _api_key = "AIzaSyA2bqlJht5G0DOJcdfXPMnb4euwdlyz7qg"  # Key hardcodeada
-    _default_model = "gemini-2.0-flash"  # Modelo por defecto
+    _api_key = os.getenv("GEMINI_API_KEY") 
+    _default_model = "gemini-2.0-flash"  
     
     def __new__(cls):
         if cls._instance is None:
