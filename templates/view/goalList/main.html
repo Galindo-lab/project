@@ -53,6 +53,7 @@
             {# Nombre de la meta #}
             <div>
               <a href="?goal_pk={{ goal.pk }}" class="mb-0 link-underline fw-medium link-underline-opacity-0{% if request.GET.goal_pk %} text-body{% endif %}">{{ goal.name }}</a>
+              <p class="small mb-0" style="max-width: 700px;">{{ goal.description }}</p>
             </div>
 
             {# Barra de progreso movida aquí y oculta en móvil #}
@@ -77,9 +78,6 @@
         {# Lista de tareas flushed #}
         {% if request.GET.goal_pk or request.GET.search %}
           <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <p class="small mb-0">{{ goal.description }}</p>
-            </li>
 
             {% if request.GET.search %}
               {% for task in goal.filtered_tasks %}
