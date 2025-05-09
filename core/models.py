@@ -21,6 +21,15 @@ class Project(models.Model):
     last_modified = models.DateTimeField()
     is_archived = models.BooleanField(default=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    def calculate_total_cost(self):
+        total_cost = 0
+        for goal in self.goal_set.all():
+            for task in goal.task_set.all():
+                for resource in task.resources.all():
+                    total_cost += resource.cost_per_hour * task.duration_hours
+        return total_cost 
+
 
     def __str__(self):
         return self.name

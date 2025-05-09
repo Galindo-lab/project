@@ -16,9 +16,6 @@
         </div>
 
         <div class="ms-2">
-        {# editar #}
-        <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
-
         {# delete #}
         <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteTaskModal" data-bs-task-id="{{ task.pk }}" data-bs-task-name="{{ task.name }}"><i class="bi bi-trash"></i></button>
         </div>
