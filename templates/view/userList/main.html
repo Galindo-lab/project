@@ -1,0 +1,40 @@
+{% extends 'layout/app/main.html' %}
+
+{% block modals %}
+  {% include 'layout/app/shared/Messages.html' %}
+
+{% endblock modals %}
+
+{% block main %}
+  {% include 'layout/app/shared/TopNav.html' with title='Lista de usuarios' %}
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Activo</th>
+        <th>Staff</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.get_full_name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.is_active|yesno:"Sí,No" }}</td>
+        <td>{{ user.is_staff|yesno:"Sí,No" }}</td>
+        <td>
+          <a href="{% url 'user_edit' user.pk %}" class="btn btn-sm btn-primary">Editar</a>
+          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-bs-user-id="{{ user.id }}" data-bs-user-name="{{ user.username }}">Eliminar</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include 'layout/app/shared/Pagination.html' with page_obj=users %}
+  {% include 'view/userList/modal/deleteUser.html' with id='deleteUserModal' %}
+{% endblock %}

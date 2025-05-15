@@ -6,11 +6,14 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario
+from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, UserEditView, UserListView, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
 from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, GoalGenerateView, ResourceCreateView
 
 urlpatterns = [
     path("home/", ProjectListView.as_view(), name="home"),
+    path('usuarios/', UserListView.as_view(), name='user_list'),
+    path('usuarios/<int:pk>/editar/', UserEditView.as_view(), name='user_edit'),
+    path('usuarios/<int:pk>/eliminar/', user_delete, name='user_delete'),
     
     # proyect
     path('projects/create/', ProjectCreateView.as_view(), name='project_create'),

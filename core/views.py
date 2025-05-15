@@ -29,12 +29,37 @@ from .models import Collaborator, Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
 
+
+class UserListView(ListView):
+    model = User
+    template_name = 'view/userList/main.html'
+    context_object_name = 'users'
+    paginate_by = 20
+
+@login_required
+def user_delete(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        user.is_active = False
+        user.save()
+        messages.success(request, "Usuario deshabilitado correctamente.")
+        return redirect('user_list')
+    return render(request, 'view/userList/modal/deleteUser.html', {'user': user})
+
 @login_required
 def index(request):
     """
     Render the index page.
     """
     return render(request, "layout/app/main.html")
+
+
+
+class UserEditView(UpdateView):
+    model = User
+    fields = ['username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff']
+    template_name = 'view/userList/editUser.html'
+    success_url = reverse_lazy('user_list')
 
 
 def register(request):

@@ -1,0 +1,34 @@
+<div 
+  class="modal fade" 
+  id="{{ id|default:'deleteUserModal' }}" 
+  tabindex="-1"
+  x-data="{ userId: '', userName: '' }"
+  x-init="
+    $el.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget;
+      userId = button?.getAttribute('data-bs-user-id') || '';
+      userName = button?.getAttribute('data-bs-user-name') || '';
+    });
+  "
+  aria-labelledby="deleteUserLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserLabel">Eliminar usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <form method="post" :action="'/usuarios/' + userId + '/eliminar/'">
+        {% csrf_token %}
+        <div class="modal-body">
+          ¿Seguro que deseas eliminar al usuario <strong x-text="userName"></strong>?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
