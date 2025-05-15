@@ -7,10 +7,19 @@ from django.utils import timezone
 class TaskEditForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["name", "description", "duration_hours", "status", "priority", "resources"]
+        fields = ["name", "description", "duration_hours", "status", "priority", "resources", "predecessor"]
         widgets = {
-            "resources": forms.CheckboxSelectMultiple,
+            "resources": forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
+
+            "predecessor": forms.Select,
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get("instance")
+        if instance and instance.goal:
+            self.fields["predecessor"].queryset = Task.objects.filter(goal=instance.goal).exclude(pk=instance.pk)
+
 
 class CreateTaskForm(forms.ModelForm):
     class Meta:

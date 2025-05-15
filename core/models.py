@@ -82,7 +82,7 @@ class Task(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)  
     update_date = models.DateTimeField(auto_now=True) 
     goal = models.ForeignKey("Goal", on_delete=models.CASCADE)
-    dependencies = models.ManyToManyField("self", symmetrical=False, blank=True)
+    predecessor = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
     resources = models.ManyToManyField("Resource", blank=True)
 
     def __str__(self):

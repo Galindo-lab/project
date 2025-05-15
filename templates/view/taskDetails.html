@@ -1,6 +1,7 @@
 {% extends 'layout/app/main.html' %}
 
 {% block modals %}
+  {% include 'layout/app/shared/Messages.html' %}
 {% endblock %}
 
 {% block sidebar %}
@@ -60,23 +61,44 @@
                 </div>
 
 
+                <!-- Predecesora -->
+                <div class="form-floating mb-3">
+                    <select class="form-select" id="taskPredecessor" name="predecessor">
+                        <option value="" {% if not form.initial.predecessor %}selected{% endif %}>Sin predecesora</option>
+                        {% for t in form.fields.predecessor.queryset %}
+                            <option value="{{ t.pk }}" {% if form.initial.predecessor == t.pk or task.predecessor_id == t.pk %}selected{% endif %}>{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="taskPredecessor">TareaPredecesora</label>
+                </div>
+
+
                 <!-- Descripción -->
                 <div class="form-floating mb-3">
                     <textarea class="form-control" id="taskDescription" name="description" style="height: 200px;" required>{{ task.description }}</textarea>
                     <label for="taskDescription">Descripción</label>
                 </div>
+
+            
+
                 
                 <!-- Recursos -->
-                <div class="mb-3">
-                    <label class="form-label">Recursos Asignados</label>    
-                    <small class="form-text text-muted ms-2">Selecciona los recursos que deseas asignar a esta tarea.</small>
-
-                    <div class="mb-3">
-                    {{ form.resources }}
-                    </div>
-
+                <div class="mb-5 col">
+                    <label class="form-label">Recursos Asignados</label>
+                    <small class="form-text text-muted ">Selecciona los recursos que deseas asignar a esta tarea.</small>
+                    
+                    {% for checkbox in form.resources %}
+                        <div class="form-check">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </div>
+                    {% empty %}
+                        <span class="text-muted">No hay recursos disponibles.</span>
+                    {% endfor %}
                 </div>
-                
+                                
                 
                 <!-- Botones -->
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>

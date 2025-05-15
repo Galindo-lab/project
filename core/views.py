@@ -129,17 +129,8 @@ class TaskDetailView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         task = self.get_object()
-        goal = get_object_or_404(Goal, pk=task.goal.pk)
-        project = get_object_or_404(Project, pk=goal.project.pk)
-        
-        messages.success(self.request, "Tarea actualizada correctamente!")
-        
-        # URL de redirección
-        redirect_url = reverse("list_goals", kwargs={"pk": project.pk})
-        redirect_url += f"?goal_pk={goal.pk}"
-        
-        return redirect_url
-    
+        return reverse("details_task", kwargs={"task_pk": task.pk})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         task = self.get_object()
@@ -147,6 +138,16 @@ class TaskDetailView(LoginRequiredMixin, UpdateView):
         project = get_object_or_404(Project, pk=goal.project.pk)
         context["project"] = project
         return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "¡Tarea actualizada correctamente!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"Error en {form.fields[field].label}: {error}")
+        return super().form_invalid(form)
     
     
 class TaskCreateView(LoginRequiredMixin, View):
