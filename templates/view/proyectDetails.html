@@ -33,5 +33,25 @@
 
       <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     </form>
+
+        <h5>Invitar usuario al proyecto</h5>
+    <form method="post" action="{% url 'invitar_usuario' project.id %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="email">Correo electrónico:</label>
+        <input type="email" class="form-control" name="email" id="email" required>
+      </div>
+      <button type="submit" class="btn btn-success mt-2">Invitar</button>
+    </form>
+
+    <ul>
+  {% for collaborator in project.collaborator_set.all %}
+    <li>{{ collaborator.user.email }} - {{ collaborator.role }}</li>
+  {% empty %}
+    <li>No hay colaboradores aún.</li>
+  {% endfor %}
+</ul>
+  </div>
+
   </div>
 {% endblock %}

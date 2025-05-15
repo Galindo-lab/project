@@ -1,5 +1,7 @@
 from urllib.parse import urlencode
+from django.contrib.auth.models import User
 
+from django.core.mail import send_mail
 from django.contrib import messages
 from django.db.models import Q
 from django.db import transaction
@@ -18,7 +20,7 @@ from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm, TaskEditForm
-from .models import Goal, Project, Resource, Task
+from .models import Collaborator, Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
 
@@ -45,6 +47,41 @@ def register(request):
         {"form": form},
     )
 
+def invitar_usuario(request, project_id):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        project = get_object_or_404(Project, id=project_id)
+        try:
+            user = User.objects.get(email=email)
+            # Verifica si ya es colaborador
+            if Collaborator.objects.filter(user=user, project=project).exists():
+                messages.info(request, f"{email} ya es colaborador de este proyecto.")
+            else:
+                Collaborator.objects.create(
+                    user=user,
+                    project=project,
+                    role="Colaborador",
+                    invitation_date=timezone.now()
+                )
+                send_mail(
+                    'Invitación a colaborar en un proyecto',
+                    f'Has sido agregado como colaborador al proyecto "{project.name}".',
+                    'no-reply@tusitio.com',
+                    [email],
+                    fail_silently=False,
+                )
+                messages.success(request, f'{email} ha sido agregado como colaborador y notificado por correo.')
+        except User.DoesNotExist:
+            # Usuario no registrado, solo enviar invitación
+            send_mail(
+                'Invitación a colaborar en un proyecto',
+                f'Has sido invitado al proyecto "{project.name}". Regístrate para participar.',
+                'no-reply@tusitio.com',
+                [email],
+                fail_silently=False,
+            )
+            messages.success(request, f'Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.')
+        return redirect('details_project', pk=project.id)
 
 # Vistas de Recursos
 class ResourceEditView(LoginRequiredMixin, View):
