@@ -36,7 +36,11 @@ class Project(models.Model):
 
 
 class Collaborator(models.Model):
-    role = models.CharField(max_length=50)
+    class Permissions(models.TextChoices):
+        View = "ver", "Ver"
+        Edit = "editar", "Editar"
+    
+    role = models.CharField(max_length=10, choices=Permissions.choices)
     invitation_date = models.DateTimeField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
