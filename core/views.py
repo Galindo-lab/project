@@ -36,6 +36,18 @@ class UserListView(ListView):
     context_object_name = 'users'
     paginate_by = 20
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get("search", "").strip()
+        if search_query:
+            queryset = queryset.filter(
+                Q(username__icontains=search_query) |
+                Q(email__icontains=search_query) |
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
+            )
+        return queryset
+
 @login_required
 def user_delete(request, pk):
     user = get_object_or_404(User, pk=pk)
