@@ -71,23 +71,10 @@
                     <label class="form-label">Recursos Asignados</label>    
                     <small class="form-text text-muted ms-2">Selecciona los recursos que deseas asignar a esta tarea.</small>
 
-                    <div class="form-check">
-                        {% for resource in project.resource_set.all %}
-                            <div class="form-check">
-                                <input 
-                                    class="form-check-input" 
-                                    type="checkbox" 
-                                    id="resource{{ resource.id }}" 
-                                    name="resources" 
-                                    value="{{ resource.id }}" 
-                                    {% if resource in task.resources.all %}checked{% endif %}
-                                >
-                                <label class="form-check-label" for="resource{{ resource.id }}">
-                                    {{ resource.name }}
-                                </label>
-                            </div>
-                        {% endfor %}
+                    <div class="mb-3">
+                    {{ form.resources }}
                     </div>
+
                 </div>
                 
                 

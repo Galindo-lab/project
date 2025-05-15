@@ -17,7 +17,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm
+from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm, TaskEditForm
 from .models import Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
@@ -120,7 +120,7 @@ class ResourcesListView(LoginRequiredMixin, ListView):
 
 class TaskDetailView(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ["name", "description", "duration_hours", "status", "priority"]
+    form_class = TaskEditForm
     template_name = "view/taskDetails.html"
 
     def get_object(self):
@@ -153,17 +153,14 @@ class TaskCreateView(LoginRequiredMixin, View):
     def post(self, request, goal_pk, *args, **kwargs):
         goal = get_object_or_404(Goal, pk=goal_pk)
         project = get_object_or_404(Project, pk=goal.project.pk)
-        
-        # url de redirección
-        redirect_url = reverse("list_goals", kwargs={"pk": project.pk})
-        # si hay un goal_pk en la url, lo añadimos como parámetro
-        redirect_url += f"?goal_pk={goal_pk}"
-        
+        redirect_url = reverse("list_goals", kwargs={"pk": project.pk}) + f"?goal_pk={goal_pk}"
+
         task_form = CreateTaskForm(request.POST)
         if task_form.is_valid():
             task = task_form.save(commit=False)
             task.goal = goal
             task.save()
+            task_form.save_m2m()  # Guarda los recursos seleccionados
             messages.success(request, "Tarea creada correctamente!")
             return redirect(redirect_url)
         

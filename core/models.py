@@ -83,6 +83,7 @@ class Task(models.Model):
     update_date = models.DateTimeField(auto_now=True) 
     goal = models.ForeignKey("Goal", on_delete=models.CASCADE)
     dependencies = models.ManyToManyField("self", symmetrical=False, blank=True)
+    resources = models.ManyToManyField("Resource", blank=True)
 
     def __str__(self):
         return self.name
@@ -99,7 +100,6 @@ class Resource(models.Model):
     cost_per_hour = models.DecimalField(max_digits=10, decimal_places=2)
     type = models.CharField(max_length=20, choices=ResourceType.choices)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    tasks = models.ManyToManyField(Task, related_name="resources")
 
     def __str__(self):
         return self.name

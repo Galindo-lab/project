@@ -1,11 +1,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
-
 from core.models import Goal, Project, Task, Resource
-
 from django.utils import timezone
+
+class TaskEditForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["name", "description", "duration_hours", "status", "priority", "resources"]
+        widgets = {
+            "resources": forms.CheckboxSelectMultiple,
+        }
 
 class CreateTaskForm(forms.ModelForm):
     class Meta:
