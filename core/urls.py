@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, index, TaskDeleteView, ResourceDeleteView, invitar_usuario
+from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario
 from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, GoalGenerateView, ResourceCreateView
 
 urlpatterns = [
@@ -18,6 +18,8 @@ urlpatterns = [
     path('project/archive/', ArchiveProjectView.as_view(), name='archive_project'),
     path('project/<int:pk>/details/', ProjectEditView.as_view(), name='details_project'),
     path('project/<int:project_id>/invite/', invitar_usuario, name='invitar_usuario'),
+    path('project/<int:pk>/export/excel/', export_project_excel, name='export_project_excel'),
+
 
     
     # goals     
@@ -45,6 +47,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='view/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),
+    path('project/<int:pk>/export/csv/', export_project_csv, name='export_project_csv'),
+
     
     # URLs para el restablecimiento de contraseña
     path(route='reset_password/', view=auth_views.PasswordResetView.as_view(

@@ -1,10 +1,15 @@
+import openpyxl
+import csv
 from urllib.parse import urlencode
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font
+from django.http import HttpResponse
 from django.contrib.auth.models import User
-
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.db.models import Q
 from django.db import transaction
+from django.http import HttpResponse
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
@@ -47,6 +52,7 @@ def register(request):
         {"form": form},
     )
 
+
 def invitar_usuario(request, project_id):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -82,6 +88,7 @@ def invitar_usuario(request, project_id):
             )
             messages.success(request, f'Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.')
         return redirect('details_project', pk=project.id)
+
 
 # Vistas de Recursos
 class ResourceEditView(LoginRequiredMixin, View):
@@ -154,7 +161,6 @@ class ResourcesListView(LoginRequiredMixin, ListView):
     
 
 # Vistas de Tareas
-
 class TaskDetailView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskEditForm
@@ -405,6 +411,87 @@ class GoalGenerateView(LoginRequiredMixin, View):
 
 
 # Vistas de Proyecto
+
+
+
+
+@login_required
+def export_project_excel(request, pk):
+    project = get_object_or_404(Project, pk=pk, owner=request.user)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Proyecto"
+
+    # Encabezados
+    headers = ['Meta', 'Tarea', 'Duración (h)', 'Recurso(s)']
+    ws.append(headers)
+    for col in range(1, len(headers) + 1):
+        ws[f"{get_column_letter(col)}1"].font = Font(bold=True)
+
+    row_num = 2
+    for goal in project.goal_set.all().order_by('order'):
+        if goal.task_set.exists():
+            for task in goal.task_set.all():
+                recursos = ', '.join([res.name for res in task.resources.all()])
+                ws.append([
+                    goal.name,
+                    task.name,
+                    task.duration_hours,
+                    recursos
+                ])
+                row_num += 1
+        else:
+            ws.append([goal.name, '', '', ''])
+            row_num += 1
+
+    # Ajustar ancho de columnas
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except Exception:
+                pass
+        ws.column_dimensions[column].width = max_length + 2
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="proyecto_{project.id}.xlsx"'
+    wb.save(response)
+    return response
+
+
+
+
+
+@login_required
+def export_project_csv(request, pk):
+    project = get_object_or_404(Project, pk=pk, owner=request.user)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="proyecto_{project.id}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Meta', 'Tarea', 'Duración (h)', 'Recurso(s)'])
+
+    for goal in project.goal_set.all().order_by('order'):
+        for task in goal.task_set.all():
+            recursos = ', '.join([res.name for res in task.resources.all()])
+            writer.writerow([
+                goal.name,
+                task.name,
+                task.duration_hours,
+                recursos
+            ])
+        # Si una meta no tiene tareas, igual la mostramos
+        if not goal.task_set.exists():
+            writer.writerow([goal.name, '', '', ''])
+
+    return response
+
+
 class ProjectEditView(LoginRequiredMixin, View):
     template_name = "view/proyectDetails.html"
 
