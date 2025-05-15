@@ -57,6 +57,15 @@ def invitar_usuario(request, project_id):
     if request.method == 'POST':
         email = request.POST.get('email')
         project = get_object_or_404(Project, id=project_id)
+        
+        # Restricción para cuentas básicas
+        if request.user == project.owner and getattr(request.user, "account_type", "basic") == "basic":
+            # Excluye al dueño del conteo de colaboradores
+            num_colaboradores = Collaborator.objects.filter(project=project).exclude(user=project.owner).count()
+            if num_colaboradores >= 1:
+                messages.error(request, "Con una cuenta básica solo puedes agregar un colaborador a tu proyecto.")
+                return redirect('details_project', pk=project.id)
+        
         try:
             user = User.objects.get(email=email)
             # Verifica si ya es colaborador
@@ -411,10 +420,6 @@ class GoalGenerateView(LoginRequiredMixin, View):
 
 
 # Vistas de Proyecto
-
-
-
-
 @login_required
 def export_project_excel(request, pk):
     project = get_object_or_404(Project, pk=pk, owner=request.user)
@@ -462,9 +467,6 @@ def export_project_excel(request, pk):
     response['Content-Disposition'] = f'attachment; filename="proyecto_{project.id}.xlsx"'
     wb.save(response)
     return response
-
-
-
 
 
 @login_required
