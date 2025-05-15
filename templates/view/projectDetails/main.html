@@ -2,6 +2,7 @@
 
 {% block modals %}
   {% include 'layout/app/shared/Messages.html' %}
+  {% include 'view/projectDetails/modals/deleteCollaboratorModal.html' with id='deleteCollaboratorModal' %}
 {% endblock %}
 
 {% block sidebar %}
@@ -19,7 +20,7 @@
   <div class="overflow-auto p-2" style="height: 100dvh; ">
     <div style="max-width: 600px;">
       <div class="mt-3" id="detalles">
-        <h5>Detalles del proyecto</h5>
+        <h5 class="mb-3">Detalles del proyecto</h5>
         <form method="post">
           {% csrf_token %}
           <div class="form-floating mb-3">
@@ -41,7 +42,7 @@
       </div>
 
       <div class="mt-5" id="invitar">
-        <h5>Invitar usuario al proyecto</h5>
+        <h5 class="mb-3">Invitar usuario al proyecto</h5>
         <form method="post" action="{% url 'invitar_usuario' project.id %}">
           {% csrf_token %}
 
@@ -49,19 +50,35 @@
             <input type="email" class="form-control" name="email" id="email" placeholder="Correo electrónico" aria-label="Correo electrónico" aria-describedby="email-addon" required />
             <button type="submit" class="btn btn-secondary">Invitar</button>
           </div>
-
         </form>
         <ul>
           {% for collaborator in project.collaborator_set.all %}
-            <li>{{ collaborator.user.email }} - {{ collaborator.role }}</li>
+            <li>
+              {{ collaborator.user.email }} - {{ collaborator.role }}
+              {% if collaborator.user != project.owner %}
+              <button 
+                type="button" 
+                class="btn btn-sm btn-danger ms-2"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteCollaboratorModal"
+                data-bs-collaborator-id="{{ collaborator.id }}"
+                data-bs-collaborator-email="{{ collaborator.user.email }}"
+              >
+                Quitar
+              </button>
+              {% endif %}
+            </li>
           {% empty %}
             <li>No hay colaboradores aún.</li>
           {% endfor %}
         </ul>
       </div>
 
-      <a href="{% url 'export_project_csv' project.id %}" class="btn btn-secondary mt-3">Exportar a CSV</a>
-      <a href="{% url 'export_project_excel' project.id %}" class="btn btn-success mt-3">Exportar a Excel</a>
+      <div class="my-5">
+        <h5 class="">Invitar usuario al proyecto</h5>
+        <a href="{% url 'export_project_csv' project.id %}" class="btn btn-secondary mt-3">Exportar a CSV</a>
+        <a href="{% url 'export_project_excel' project.id %}" class="btn btn-success mt-3">Exportar a Excel</a>
+      </div>
     </div>
   </div>
 {% endblock %}

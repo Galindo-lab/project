@@ -99,6 +99,30 @@ def invitar_usuario(request, project_id):
         return redirect('details_project', pk=project.id)
 
 
+@login_required
+def eliminar_colaborador(request, project_id):
+    
+    if request.method != "POST":
+        messages.error(request, "Operación no permitida.")
+        return redirect('details_project', pk=project_id)
+
+    collaborator_id = request.POST.get("collaborator_id")
+    if not collaborator_id:
+        messages.error(request, "No se especificó el colaborador a eliminar.")
+        return redirect('details_project', pk=project_id)
+
+    project = get_object_or_404(Project, id=project_id)
+    collaborator = get_object_or_404(Collaborator, id=collaborator_id, project=project)
+
+    if collaborator.user == project.owner:
+        messages.error(request, "No puedes eliminar al propietario del proyecto.")
+    else:
+        collaborator.delete()
+        messages.success(request, "Colaborador eliminado correctamente.")
+
+    return redirect('details_project', pk=project_id)
+
+
 # Vistas de Recursos
 class ResourceEditView(LoginRequiredMixin, View):
     def post(self, request, project_pk, *args, **kwargs):
@@ -495,7 +519,7 @@ def export_project_csv(request, pk):
 
 
 class ProjectEditView(LoginRequiredMixin, View):
-    template_name = "view/proyectDetails.html"
+    template_name = "view/projectDetails/main.html"
 
     def get(self, request, pk):
         project = get_object_or_404(Project, pk=pk, owner=request.user)
