@@ -24,6 +24,7 @@ from core.views import (
     TaskOverwriteWithAIView,
     UserEditView,
     UserListView,
+    UserProfileView,
     editar_colaborador,
     eliminar_colaborador,
     export_project_csv,
@@ -47,6 +48,7 @@ from core.views import (
 
 urlpatterns = [
     path("home/", ProjectListView.as_view(), name="home"),
+    path("perfil/", UserProfileView.as_view(), name="profile_edit"),
     path("usuarios/", UserListView.as_view(), name="user_list"),
     path("usuarios/<int:pk>/editar/", UserEditView.as_view(), name="user_edit"),
     path("usuarios/<int:pk>/eliminar/", user_delete, name="user_delete"),

@@ -5,7 +5,15 @@ from core.models import Goal, Project, Task, Resource
 from django.utils import timezone
 
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email"]
 
+class PasswordChangeCustomForm(forms.Form):
+    old_password = forms.CharField(label="Contraseña actual", widget=forms.PasswordInput)
+    new_password1 = forms.CharField(label="Nueva contraseña", widget=forms.PasswordInput)
+    new_password2 = forms.CharField(label="Confirmar nueva contraseña", widget=forms.PasswordInput)
 
 class EmprendedorDescripcionForm(forms.Form):
     idea = forms.CharField(label="¿Cuál es tu idea de negocio o proyecto?", widget=forms.Textarea)

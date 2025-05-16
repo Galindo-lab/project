@@ -1,0 +1,21 @@
+{% extends 'layout/app/main.html' %}
+
+{% block main %}
+<div class="container mt-4">
+  <h2>Editar Perfil</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ profile_form.as_p }}
+    <button type="submit" name="update_profile" class="btn btn-primary">Actualizar Perfil</button>
+  </form>
+
+  <hr>
+
+  <h3>Cambiar Contraseña</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ password_form.as_p }}
+    <button type="submit" name="change_password" class="btn btn-warning">Cambiar Contraseña</button>
+  </form>
+</div>
+{% endblock %}

@@ -25,15 +25,18 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import update_session_auth_hash
 
 from .forms import (
     ArchiveProjectForm,
     CreateResourceForm,
     CreateTaskForm,
+    PasswordChangeCustomForm,
     ProjectEditForm,
     RegisterForm,
     TaskEditForm,
     EmprendedorDescripcionForm,
+    UserProfileForm,
 )
 from .models import Collaborator, Goal, Project, Resource, Task
 from .generators import GeminiGenerator
@@ -176,6 +179,47 @@ def invitar_usuario(request, project_id):
                 f"Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.",
             )
         return redirect("details_project", pk=project.id)
+
+
+class UserProfileView(LoginRequiredMixin, View):
+    template_name = "view/profile_edit.html"
+
+    def get(self, request):
+        profile_form = UserProfileForm(instance=request.user)
+        password_form = PasswordChangeCustomForm()
+        return render(request, self.template_name, {
+            "profile_form": profile_form,
+            "password_form": password_form,
+        })
+
+    def post(self, request):
+        profile_form = UserProfileForm(request.POST, instance=request.user)
+        password_form = PasswordChangeCustomForm(request.POST)
+
+        if "update_profile" in request.POST:
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Perfil actualizado correctamente.")
+                return redirect("profile_edit")
+        elif "change_password" in request.POST:
+            if password_form.is_valid():
+                old_password = password_form.cleaned_data["old_password"]
+                new_password1 = password_form.cleaned_data["new_password1"]
+                new_password2 = password_form.cleaned_data["new_password2"]
+                if not request.user.check_password(old_password):
+                    messages.error(request, "La contraseña actual es incorrecta.")
+                elif new_password1 != new_password2:
+                    messages.error(request, "Las nuevas contraseñas no coinciden.")
+                else:
+                    request.user.set_password(new_password1)
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                    messages.success(request, "Contraseña cambiada correctamente.")
+                    return redirect("profile_edit")
+        return render(request, self.template_name, {
+            "profile_form": profile_form,
+            "password_form": password_form,
+        })
 
 
 @login_required
