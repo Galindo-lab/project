@@ -339,6 +339,8 @@ class TaskDetailView(LoginRequiredMixin, UpdateView):
         goal = get_object_or_404(Goal, pk=task.goal.pk)
         project = get_object_or_404(Project, pk=goal.project.pk)
         context["project"] = project
+        # Limitar los recursos del formulario solo a los del proyecto
+        context["form"].fields["resources"].queryset = project.resource_set.all()
         return context
 
     def form_valid(self, form):
