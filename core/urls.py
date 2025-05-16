@@ -17,6 +17,7 @@ from core.views import (
     ProjectDescriptionAIEditView,
     ProjectEditView,
     ResourceEditView,
+    ResourceGenerateAIView,
     ResourcesListView,
     TaskCreateView,
     TaskDetailView,
@@ -125,6 +126,11 @@ urlpatterns = [
         name="overwrite_task_ai",
     ),
     # resources
+    path(
+        "projects/<int:project_pk>/resources/generate-ai/",
+        ResourceGenerateAIView.as_view(),
+        name="generate_resource_ai",
+    ),
     path(
         "project/<int:project_pk>/resources/",
         ResourcesListView.as_view(),

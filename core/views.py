@@ -362,6 +362,21 @@ class ResourcesListView(LoginRequiredMixin, ListView):
         return context
 
 
+class ResourceGenerateAIView(LoginRequiredMixin, View):
+    def get(self, request, project_pk, *args, **kwargs):
+        project = get_object_or_404(Project, pk=project_pk)
+        gg = GeminiGenerator()
+        resource_data = gg.generate_resource(project, project.description)
+        # Crea el recurso en la base de datos
+        Resource.objects.create(
+            name=resource_data["name"],
+            type=resource_data["type"],
+            cost_per_hour=resource_data["cost_per_hour"],
+            project=project,
+        )
+        messages.success(request, "Recurso generado correctamente con IA.")
+        return redirect(reverse("resources", kwargs={"project_pk": project.pk}))
+
 # Vistas de Tareas
 class TaskDetailView(LoginRequiredMixin, UpdateView):
     model = Task

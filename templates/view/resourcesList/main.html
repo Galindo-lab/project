@@ -43,6 +43,10 @@
 
 {% block sidebar %}
   <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createResourceModal"><i class="bi bi-plus"></i> Nuevo Recurso</button>
+
+  <a href="{% url 'generate_resource_ai' project.pk %}" class="btn btn-outline-primary btn-sm">
+  Generar recurso con IA
+</a>
 {% endblock %}
 
 {% block main %}

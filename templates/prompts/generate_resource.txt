@@ -1,0 +1,21 @@
+Genera exactamente UN recurso necesario para el proyecto, siguiendo ESTRICTAMENTE este formato (sin listas, negritas, títulos ni texto adicional):
+
+<<nombre del recurso>>|<<tipo>>|<<costo por hora (solo número)>>
+
+Contexto del proyecto:
+{{ context }}
+
+Recursos ya existentes en el proyecto:
+{% for resource in existing_resources %}
+- {{ resource.name }} ({{ resource.get_type_display }})
+{% empty %}
+- (No hay recursos aún)
+{% endfor %}
+
+Reglas:
+1. La respuesta debe ser UNA sola línea, usando el formato: nombre|tipo|costo.
+2. Usa el carácter "|" como separador, sin saltos de línea ni texto adicional.
+3. Si no hay información suficiente, responde: Recurso genérico|human|100
+4. El nombre debe ser claro y no repetir ninguno de los recursos existentes.
+5. Tipo puede ser: human, material, financial, technological.
+6. No incluyas títulos, listas, negritas ni explicaciones.
