@@ -1,10 +1,11 @@
-from django import forms
+
 import openpyxl
 import csv
 
 from urllib.parse import urlencode
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
+from django import forms
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -26,6 +27,9 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.shortcuts import get_object_or_404
+
 
 from .forms import (
     ArchiveProjectForm,
@@ -38,10 +42,45 @@ from .forms import (
     EmprendedorDescripcionForm,
     UserProfileForm,
 )
-from .models import Collaborator, Goal, Project, Resource, Task
+
+from .models import (
+    Collaborator, 
+    Goal, 
+    Project, 
+    Resource, 
+    Task, 
+    Collaborator
+)
+
 from .generators import GeminiGenerator
 
 
+
+class CollaboratorOrStaffRequiredMixin(UserPassesTestMixin):
+    """
+    Permite el acceso si el usuario es staff o colaborador del proyecto.s
+    Requiere que la vista tenga 'project_pk' o 'pk' en self.kwargs.
+    """
+
+    def test_func(self):
+        user = self.request.user
+        if user.is_staff:
+            return True
+
+        # Intenta obtener el project_pk o pk de la URL
+        project_pk = self.kwargs.get("project_pk") or self.kwargs.get("pk")
+        if not project_pk:
+            return False
+
+        project = get_object_or_404(Project, pk=project_pk)
+        return Collaborator.objects.filter(user=user, project=project).exists()
+
+
+
+
+
+
+# Usuarios 
 @login_required
 def editar_colaborador(request, project_id, collaborator_id):
     collaborator = get_object_or_404(
@@ -102,6 +141,10 @@ class UserEditView(UpdateView):
     template_name = "view/userList/editUser.html"
     success_url = reverse_lazy("user_list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["projects"] = Project.objects.filter(owner=self.object)
+        return context
 
 def register(request):
     if request.method == "POST":
