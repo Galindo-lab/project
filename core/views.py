@@ -28,7 +28,18 @@ from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, Proje
 from .models import Collaborator, Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
-
+@login_required
+def editar_colaborador(request, project_id, collaborator_id):
+    collaborator = get_object_or_404(Collaborator, id=collaborator_id, project_id=project_id)
+    if request.method == "POST":
+        role = request.POST.get("role")
+        if role in dict(Collaborator.Permissions.choices):
+            collaborator.role = role
+            collaborator.save()
+            messages.success(request, "Permiso actualizado correctamente.")
+        else:
+            messages.error(request, "Permiso no válido.")
+    return redirect('details_project', pk=project_id)
 
 class UserListView(ListView):
     model = User

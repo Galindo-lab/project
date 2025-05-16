@@ -46,7 +46,7 @@ class Collaborator(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 
-class Goal(models.Model):  # formerly "Meta"
+class Goal(models.Model): 
     name = models.CharField(max_length=100)
     description = models.TextField()
     completion_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)

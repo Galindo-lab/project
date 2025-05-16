@@ -54,18 +54,26 @@
         <ul>
           {% for collaborator in project.collaborator_set.all %}
             <li>
-              {{ collaborator.user.email }} - {{ collaborator.role }}
+              {{ collaborator.user.email }} -
+              <form method="post" action="{% url 'editar_colaborador' project.id collaborator.id %}" style="display:inline;">
+                {% csrf_token %}
+                <select name="role" class="form-select form-select-sm d-inline w-auto" style="min-width: 100px;" onchange="this.form.submit()">
+                  {% for value, label in collaborator.Permissions.choices %}
+                    <option value="{{ value }}" {% if collaborator.role == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </form>
               {% if collaborator.user != project.owner %}
-              <button 
-                type="button" 
-                class="btn btn-sm btn-danger ms-2"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteCollaboratorModal"
-                data-bs-collaborator-id="{{ collaborator.id }}"
-                data-bs-collaborator-email="{{ collaborator.user.email }}"
-              >
-                Quitar
-              </button>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-danger ms-2"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteCollaboratorModal"
+                  data-bs-collaborator-id="{{ collaborator.id }}"
+                  data-bs-collaborator-email="{{ collaborator.user.email }}"
+                >
+                  Quitar
+                </button>
               {% endif %}
             </li>
           {% empty %}
