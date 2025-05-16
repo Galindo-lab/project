@@ -327,6 +327,22 @@ class TaskGenerateView(LoginRequiredMixin, View):
         return redirect(f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}")
 
 
+class TaskOverwriteWithAIView(LoginRequiredMixin, View):
+    def get(self, request, task_pk, *args, **kwargs):
+        task = get_object_or_404(Task, pk=task_pk)
+        goal = task.goal
+        project = goal.project
+        gg = GeminiGenerator()
+        # Genera nuevos datos para la tarea usando el contexto actual
+        task_data = gg.generate_task(goal, project.description)
+        # Sobrescribe los datos de la tarea
+        task.name = task_data["name"]
+        task.description = task_data["description"]
+        task.duration_hours = task_data["duration_hours"]
+        task.save()
+        messages.success(request, "Tarea sobrescrita con IA correctamente!")
+        return redirect(f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}")
+
 # Vistas de Objetivos
 class GoalsListView(LoginRequiredMixin, ListView):
     template_name = "view/goalList/main.html"
@@ -490,22 +506,35 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
         return redirect(reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")}))
 
 
-class GoalGenerateView(LoginRequiredMixin, View):
+
+class GoalGenerateNewView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        project = get_object_or_404(Project, pk=pk)
+        gg = GeminiGenerator()
+        # El pk que se pasa aquí es solo para contexto, puedes pasar None o 0 si quieres
+        goal_obj = gg.generate_goal(project, project.description, 0)
+        # Crea la meta en la base de datos
+        goal = Goal.objects.create(
+            name=goal_obj.name,
+            description=goal_obj.description,
+            project=project
+        )
+        messages.success(request, "Meta generada correctamente con IA.")
+        return redirect(reverse('list_goals', kwargs={'pk': pk}))
+    
+
+class GoalOverwriteWithAIView(LoginRequiredMixin, View):
     def get(self, request, pk, goalpk, *args, **kwargs):
         project = get_object_or_404(Project, pk=pk)
         goal = get_object_or_404(Goal, pk=goalpk, project=project)
-
         gg = GeminiGenerator()
         goal2 = gg.generate_goal(project, project.description, goalpk)
-        
-        print(goal2)
-
         goal.name = goal2.name
         goal.description = goal2.description
         goal.save()
-
-        messages.success(request, "Contenido generado correctamente!")
+        messages.success(request, "Meta sobrescrita correctamente con IA.")
         return redirect(f"{reverse('list_goals', kwargs={'pk': pk})}?goal_pk={goal.pk}")
+    
 
 
 # Vistas de Proyecto

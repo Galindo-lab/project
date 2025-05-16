@@ -19,10 +19,14 @@
     <button data-bs-toggle="modal" data-bs-target="#createTask" class="btn btn-lg btn-primary w-100 my-2"><i class="bi bi-plus-lg"></i> Crear Tarea</button>
 
     {# Generar tarea con IA #}
-    <a href="{% url 'generate_task' goal_pk=request.GET.goal_pk %}" class="btn btn-lg btn-secondary w-100 my-2" title="Generar tarea con IA"><i class="bi bi-lightning-charge"></i>Generar Tarea</a>
+    <a href="{% url 'generate_task' goal_pk=request.GET.goal_pk %}" class="btn btn-sm btn-secondary w-100 my-2" title="Generar tarea con IA"><i class="bi bi-lightning-charge me-1"></i>Generar Tarea</a>
   {% else %}
     {# Call to action para crear una nueva meta #}
     <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
+
+    <a href="{% url 'generate_goal_new' pk=project.pk %}" class="btn btn-sm btn-secondary w-100 my-2" title="Generar meta con IA">
+      <i class="bi bi-stars me-1"></i>Generar Meta
+    </a>
   {% endif %}
 
   {# Lista de metas #}
@@ -73,7 +77,7 @@
               <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
 
               {# IA #}
-              <a href="{% url 'generate_goal' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
+              <a href="{% url 'overwrite_goal_ai' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
             </div>
           </div>
         </div>

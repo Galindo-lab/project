@@ -6,8 +6,8 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, TaskGenerateView, UserEditView, UserListView, editar_colaborador, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
-from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, GoalGenerateView, ResourceCreateView
+from core.views import DeleteProjectView, GoalCreateView, GoalGenerateNewView, GoalOrderView, GoalOverwriteWithAIView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, TaskGenerateView, TaskOverwriteWithAIView, UserEditView, UserListView, editar_colaborador, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
+from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, ResourceCreateView
 
 urlpatterns = [
     path("home/", ProjectListView.as_view(), name="home"),
@@ -32,14 +32,16 @@ urlpatterns = [
     path('project/<int:pk>/goal/delete', GoalDeleteView.as_view(), name='delete_goal'),
     path('project/<int:pk>/goal/update', GoalUpdateView.as_view(), name='update_goal'),
     path('project/<int:pk>/goal/<int:goalpk>/<str:action>', GoalOrderView.as_view(), name='order_goal'),
-    path('project/<int:pk>/generategoal/<int:goalpk>/', GoalGenerateView.as_view(), name='generate_goal'),
-    
+    path('project/<int:pk>/generate_goal/', GoalGenerateNewView.as_view(), name='generate_goal_new'),
+    path('project/<int:pk>/goal/<int:goalpk>/overwrite_with_ai/', GoalOverwriteWithAIView.as_view(), name='overwrite_goal_ai'),
+
     # tasks
     path('goal/<int:goal_pk>/create/task', TaskCreateView.as_view(), name='create_task'),
     path('goal/<int:goal_pk>/delete/task', TaskDeleteView.as_view(), name='delete_task'),
     path('task/delete/', TaskDeleteView.as_view(), name='delete_task'),
     path('task/<int:task_pk>/details/', TaskDetailView.as_view(), name='details_task'),
     path('goal/<int:goal_pk>/generatetask/', TaskGenerateView.as_view(), name='generate_task'),
+    path('task/<int:task_pk>/overwrite_with_ai/', TaskOverwriteWithAIView.as_view(), name='overwrite_task_ai'),
 
     
     # resources

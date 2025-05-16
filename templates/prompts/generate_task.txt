@@ -8,7 +8,15 @@ Genera exactamente una tarea para la meta indicada, siguiendo ESTE FORMATO (sin 
 **Meta objetivo:**
 - {{ goal.name }}: {{ goal.description }}
 
+**Tareas ya existentes en la meta:**
+{% for task in goal.task_set.all %}
+- {{ task.name }}: {{ task.description }}
+{% empty %}
+- (No hay tareas aún)
+{% endfor %}
+
 **Reglas estrictas:**
 1. La salida debe ser ÚNICAMENTE una línea con el formato <<nombre>>|<<descripción>>|<<duración>>.
 2. Usa el carácter "|" como separador y nunca incluyas saltos de línea, puntos adicionales ni otros símbolos.
 3. Si no hay datos, usa: `Tarea genérica|Realizar una acción relevante para la meta|8`
+4. La descripción de la tarea debe ser breve y clara, sin detalles innecesarios.
