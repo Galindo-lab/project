@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, UserEditView, UserListView, editar_colaborador, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
+from core.views import DeleteProjectView, GoalCreateView, GoalOrderView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, TaskGenerateView, UserEditView, UserListView, editar_colaborador, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
 from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, GoalGenerateView, ResourceCreateView
 
 urlpatterns = [
@@ -39,7 +39,8 @@ urlpatterns = [
     path('goal/<int:goal_pk>/delete/task', TaskDeleteView.as_view(), name='delete_task'),
     path('task/delete/', TaskDeleteView.as_view(), name='delete_task'),
     path('task/<int:task_pk>/details/', TaskDetailView.as_view(), name='details_task'),
-    # path('task/<int:pk>/update/', TaskUpdateView.as_view(), name='update_task'),
+    path('goal/<int:goal_pk>/generatetask/', TaskGenerateView.as_view(), name='generate_task'),
+
     
     # resources
     path('project/<int:project_pk>/resources/', ResourcesListView.as_view(), name='resources'),

@@ -77,7 +77,6 @@ def index(request):
     return render(request, "layout/app/main.html")
 
 
-
 class UserEditView(UpdateView):
     model = User
     fields = ['username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff']
@@ -308,6 +307,24 @@ class TaskDeleteView(LoginRequiredMixin, View):
         task.delete()
         messages.success(request, "Tarea eliminada correctamente!")
         return redirect(redirect_url)
+
+
+class TaskGenerateView(LoginRequiredMixin, View):
+    def get(self, request, goal_pk, *args, **kwargs):
+        goal = get_object_or_404(Goal, pk=goal_pk)
+        project = goal.project
+        gg = GeminiGenerator()
+        task_data = gg.generate_task(goal, project.description)
+        # Crea la tarea en la base de datos
+        from .models import Task
+        task = Task.objects.create(
+            name=task_data["name"],
+            description=task_data["description"],
+            duration_hours=task_data["duration_hours"],
+            goal=goal
+        )
+        messages.success(request, "Tarea generada correctamente!")
+        return redirect(f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}")
 
 
 # Vistas de Objetivos
@@ -692,3 +709,6 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context["search_query"] = self.request.GET.get("search", "")
         context["current_filter"] = self.request.GET.get("filter", "")
         return context
+
+
+

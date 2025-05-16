@@ -1,0 +1,14 @@
+Genera exactamente una tarea para la meta indicada, siguiendo ESTE FORMATO (sin listas, negritas, títulos ni texto adicional) y siempre usando este formato:
+
+<<nombre de la tarea>>|<<descripción de la tarea>>|<<duración estimada en horas (solo número)>>
+
+**Contexto del proyecto:**
+- {{ context }}
+
+**Meta objetivo:**
+- {{ goal.name }}: {{ goal.description }}
+
+**Reglas estrictas:**
+1. La salida debe ser ÚNICAMENTE una línea con el formato <<nombre>>|<<descripción>>|<<duración>>.
+2. Usa el carácter "|" como separador y nunca incluyas saltos de línea, puntos adicionales ni otros símbolos.
+3. Si no hay datos, usa: `Tarea genérica|Realizar una acción relevante para la meta|8`

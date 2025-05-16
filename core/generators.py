@@ -1,4 +1,3 @@
-
 from django.template.loader import render_to_string
 from django.shortcuts import render
 from .llmshet import GeminiShet  
@@ -25,3 +24,20 @@ class GeminiGenerator:
         
         goal = Goal(name=name, description=description, project=proyect)    
         return goal
+
+    def generate_task(self, goal:Goal, context:str) -> dict:
+        gemini = GeminiShet()
+        prompt = render_to_string("prompts/generate_task.txt", {
+            "goal": goal,
+            "context": context
+        })
+        print(prompt)
+        response = gemini.generate_content(prompt)
+        print("Respuesta: ", response)
+        # Espera formato: nombre|descripcion|duracion
+        name, description, duration = response.split('|')
+        return {
+            "name": name.strip(),
+            "description": description.strip(),
+            "duration_hours": float(duration.strip())
+        }

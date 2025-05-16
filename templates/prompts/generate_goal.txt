@@ -1,4 +1,4 @@
-Genera exactamente una meta para un proyecto, siguiendo ESTE FORMATO (sin listas, negritas, títulos o texto adicional):
+Genera exactamente una meta para un proyecto, siguiendo ESTE FORMATO (sin listas, negritas, títulos o texto adicional) siempre sin ninguna exepción siempre vas a usar  este formato:
 
 <<nombre de la meta>>|<<descripción de la meta>>
 
