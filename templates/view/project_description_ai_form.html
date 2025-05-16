@@ -1,5 +1,9 @@
 {% extends 'layout/app/main.html' %}
 
+{% block modals %}
+  {% include 'layout/app/shared/Messages.html' %}
+{% endblock %}
+
 {% block main %}
   {% include 'layout/app/shared/TopNav.html' with title='Generar proyecto con IA' %}
   <div class="overflow-auto p-2" style="height: 100dvh;">

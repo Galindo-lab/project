@@ -26,13 +26,24 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm, TaskEditForm, EmprendedorDescripcionForm
+from .forms import (
+    ArchiveProjectForm,
+    CreateResourceForm,
+    CreateTaskForm,
+    ProjectEditForm,
+    RegisterForm,
+    TaskEditForm,
+    EmprendedorDescripcionForm,
+)
 from .models import Collaborator, Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
+
 @login_required
 def editar_colaborador(request, project_id, collaborator_id):
-    collaborator = get_object_or_404(Collaborator, id=collaborator_id, project_id=project_id)
+    collaborator = get_object_or_404(
+        Collaborator, id=collaborator_id, project_id=project_id
+    )
     if request.method == "POST":
         role = request.POST.get("role")
         if role in dict(Collaborator.Permissions.choices):
@@ -41,12 +52,13 @@ def editar_colaborador(request, project_id, collaborator_id):
             messages.success(request, "Permiso actualizado correctamente.")
         else:
             messages.error(request, "Permiso no válido.")
-    return redirect('details_project', pk=project_id)
+    return redirect("details_project", pk=project_id)
+
 
 class UserListView(ListView):
     model = User
-    template_name = 'view/userList/main.html'
-    context_object_name = 'users'
+    template_name = "view/userList/main.html"
+    context_object_name = "users"
     paginate_by = 20
 
     def get_queryset(self):
@@ -54,12 +66,13 @@ class UserListView(ListView):
         search_query = self.request.GET.get("search", "").strip()
         if search_query:
             queryset = queryset.filter(
-                Q(username__icontains=search_query) |
-                Q(email__icontains=search_query) |
-                Q(first_name__icontains=search_query) |
-                Q(last_name__icontains=search_query)
+                Q(username__icontains=search_query)
+                | Q(email__icontains=search_query)
+                | Q(first_name__icontains=search_query)
+                | Q(last_name__icontains=search_query)
             )
         return queryset
+
 
 @login_required
 def user_delete(request, pk):
@@ -68,8 +81,9 @@ def user_delete(request, pk):
         user.is_active = False
         user.save()
         messages.success(request, "Usuario deshabilitado correctamente.")
-        return redirect('user_list')
-    return render(request, 'view/userList/modal/deleteUser.html', {'user': user})
+        return redirect("user_list")
+    return render(request, "view/userList/modal/deleteUser.html", {"user": user})
+
 
 @login_required
 def index(request):
@@ -81,9 +95,9 @@ def index(request):
 
 class UserEditView(UpdateView):
     model = User
-    fields = ['username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff']
-    template_name = 'view/userList/editUser.html'
-    success_url = reverse_lazy('user_list')
+    fields = ["username", "first_name", "last_name", "email", "is_active", "is_staff"]
+    template_name = "view/userList/editUser.html"
+    success_url = reverse_lazy("user_list")
 
 
 def register(request):
@@ -103,18 +117,28 @@ def register(request):
 
 
 def invitar_usuario(request, project_id):
-    if request.method == 'POST':
-        email = request.POST.get('email')
+    if request.method == "POST":
+        email = request.POST.get("email")
         project = get_object_or_404(Project, id=project_id)
-        
+
         # Restricción para cuentas básicas
-        if request.user == project.owner and getattr(request.user, "account_type", "basic") == "basic":
+        if (
+            request.user == project.owner
+            and getattr(request.user, "account_type", "basic") == "basic"
+        ):
             # Excluye al dueño del conteo de colaboradores
-            num_colaboradores = Collaborator.objects.filter(project=project).exclude(user=project.owner).count()
+            num_colaboradores = (
+                Collaborator.objects.filter(project=project)
+                .exclude(user=project.owner)
+                .count()
+            )
             if num_colaboradores >= 1:
-                messages.error(request, "Con una cuenta básica solo puedes agregar un colaborador a tu proyecto.")
-                return redirect('details_project', pk=project.id)
-        
+                messages.error(
+                    request,
+                    "Con una cuenta básica solo puedes agregar un colaborador a tu proyecto.",
+                )
+                return redirect("details_project", pk=project.id)
+
         try:
             user = User.objects.get(email=email)
             # Verifica si ya es colaborador
@@ -125,40 +149,46 @@ def invitar_usuario(request, project_id):
                     user=user,
                     project=project,
                     role="Colaborador",
-                    invitation_date=timezone.now()
+                    invitation_date=timezone.now(),
                 )
                 send_mail(
-                    'Invitación a colaborar en un proyecto',
+                    "Invitación a colaborar en un proyecto",
                     f'Has sido agregado como colaborador al proyecto "{project.name}".',
-                    'no-reply@tusitio.com',
+                    "no-reply@tusitio.com",
                     [email],
                     fail_silently=False,
                 )
-                messages.success(request, f'{email} ha sido agregado como colaborador y notificado por correo.')
+                messages.success(
+                    request,
+                    f"{email} ha sido agregado como colaborador y notificado por correo.",
+                )
         except User.DoesNotExist:
             # Usuario no registrado, solo enviar invitación
             send_mail(
-                'Invitación a colaborar en un proyecto',
+                "Invitación a colaborar en un proyecto",
                 f'Has sido invitado al proyecto "{project.name}". Regístrate para participar.',
-                'no-reply@tusitio.com',
+                "no-reply@tusitio.com",
                 [email],
                 fail_silently=False,
             )
-            messages.success(request, f'Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.')
-        return redirect('details_project', pk=project.id)
+            messages.success(
+                request,
+                f"Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.",
+            )
+        return redirect("details_project", pk=project.id)
 
 
 @login_required
 def eliminar_colaborador(request, project_id):
-    
+
     if request.method != "POST":
         messages.error(request, "Operación no permitida.")
-        return redirect('details_project', pk=project_id)
+        return redirect("details_project", pk=project_id)
 
     collaborator_id = request.POST.get("collaborator_id")
     if not collaborator_id:
         messages.error(request, "No se especificó el colaborador a eliminar.")
-        return redirect('details_project', pk=project_id)
+        return redirect("details_project", pk=project_id)
 
     project = get_object_or_404(Project, id=project_id)
     collaborator = get_object_or_404(Collaborator, id=collaborator_id, project=project)
@@ -169,7 +199,7 @@ def eliminar_colaborador(request, project_id):
         collaborator.delete()
         messages.success(request, "Colaborador eliminado correctamente.")
 
-    return redirect('details_project', pk=project_id)
+    return redirect("details_project", pk=project_id)
 
 
 # Vistas de Recursos
@@ -201,10 +231,10 @@ class ResourceDeleteView(LoginRequiredMixin, View):
 class ResourceCreateView(LoginRequiredMixin, View):
     def post(self, request, project_pk, *args, **kwargs):
         project = get_object_or_404(Project, pk=project_pk)
-        
+
         # URL de redirección
         redirect_url = reverse("resources", kwargs={"project_pk": project.pk})
-        
+
         resource_form = CreateResourceForm(request.POST)
         if resource_form.is_valid():
             resource = resource_form.save(commit=False)
@@ -212,10 +242,13 @@ class ResourceCreateView(LoginRequiredMixin, View):
             resource.save()
             messages.success(request, "Recurso creado correctamente!")
             return redirect(redirect_url)
-        
-        messages.error(request, "Error al crear el recurso. Por favor, verifica los datos ingresados.")
+
+        messages.error(
+            request,
+            "Error al crear el recurso. Por favor, verifica los datos ingresados.",
+        )
         return redirect(redirect_url)
-    
+
 
 class ResourcesListView(LoginRequiredMixin, ListView):
     model = Resource
@@ -228,9 +261,7 @@ class ResourcesListView(LoginRequiredMixin, ListView):
         search_query = self.request.GET.get("search", "").strip()
 
         if search_query:
-            return project.resource_set.filter(
-                Q(name__icontains=search_query)
-            )
+            return project.resource_set.filter(Q(name__icontains=search_query))
 
         return project.resource_set.all()
 
@@ -238,9 +269,11 @@ class ResourcesListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
         context["project"] = project
-        context["resource_type_choices"] = Resource.ResourceType.choices  # Agregar las opciones de tipo de recurso
+        context["resource_type_choices"] = (
+            Resource.ResourceType.choices
+        )  # Agregar las opciones de tipo de recurso
         return context
-    
+
 
 # Vistas de Tareas
 class TaskDetailView(LoginRequiredMixin, UpdateView):
@@ -271,15 +304,19 @@ class TaskDetailView(LoginRequiredMixin, UpdateView):
     def form_invalid(self, form):
         for field, errors in form.errors.items():
             for error in errors:
-                messages.error(self.request, f"Error en {form.fields[field].label}: {error}")
+                messages.error(
+                    self.request, f"Error en {form.fields[field].label}: {error}"
+                )
         return super().form_invalid(form)
-    
-    
+
+
 class TaskCreateView(LoginRequiredMixin, View):
     def post(self, request, goal_pk, *args, **kwargs):
         goal = get_object_or_404(Goal, pk=goal_pk)
         project = get_object_or_404(Project, pk=goal.project.pk)
-        redirect_url = reverse("list_goals", kwargs={"pk": project.pk}) + f"?goal_pk={goal_pk}"
+        redirect_url = (
+            reverse("list_goals", kwargs={"pk": project.pk}) + f"?goal_pk={goal_pk}"
+        )
 
         task_form = CreateTaskForm(request.POST)
         if task_form.is_valid():
@@ -289,23 +326,23 @@ class TaskCreateView(LoginRequiredMixin, View):
             task_form.save_m2m()  # Guarda los recursos seleccionados
             messages.success(request, "Tarea creada correctamente!")
             return redirect(redirect_url)
-        
+
         messages.error(request, "Error al crear la tarea.")
         return redirect(redirect_url)
-        
-        
+
+
 class TaskDeleteView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         task_id = request.POST.get("task_id")
         task = get_object_or_404(Task, pk=task_id)
         goal = get_object_or_404(Goal, pk=task.goal.pk)
         project = get_object_or_404(Project, pk=goal.project.pk)
-        
+
         # url de redirección
         redirect_url = reverse("list_goals", kwargs={"pk": project.pk})
         # si hay un goal_pk en la url, lo añadimos como parámetro
         redirect_url += f"?goal_pk={goal.pk}"
-        
+
         task.delete()
         messages.success(request, "Tarea eliminada correctamente!")
         return redirect(redirect_url)
@@ -319,14 +356,17 @@ class TaskGenerateView(LoginRequiredMixin, View):
         task_data = gg.generate_task(goal, project.description)
         # Crea la tarea en la base de datos
         from .models import Task
+
         task = Task.objects.create(
             name=task_data["name"],
             description=task_data["description"],
             duration_hours=task_data["duration_hours"],
-            goal=goal
+            goal=goal,
         )
         messages.success(request, "Tarea generada correctamente!")
-        return redirect(f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}")
+        return redirect(
+            f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}"
+        )
 
 
 class TaskOverwriteWithAIView(LoginRequiredMixin, View):
@@ -343,7 +383,10 @@ class TaskOverwriteWithAIView(LoginRequiredMixin, View):
         task.duration_hours = task_data["duration_hours"]
         task.save()
         messages.success(request, "Tarea sobrescrita con IA correctamente!")
-        return redirect(f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}")
+        return redirect(
+            f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}"
+        )
+
 
 # Vistas de Objetivos
 class GoalsListView(LoginRequiredMixin, ListView):
@@ -363,9 +406,7 @@ class GoalsListView(LoginRequiredMixin, ListView):
 
         if search_query:
             # Filtrar metas que tienen tareas que coinciden con el término de búsqueda
-            queryset = queryset.filter(
-                task__name__icontains=search_query
-            ).distinct()
+            queryset = queryset.filter(task__name__icontains=search_query).distinct()
 
         return queryset
 
@@ -389,10 +430,14 @@ class GoalsListView(LoginRequiredMixin, ListView):
 class GoalOrderView(LoginRequiredMixin, View):
     def get(self, request, pk, goalpk, action):
         current_goal = get_object_or_404(Goal, pk=goalpk, project__pk=pk)
-        
+
         # Obtenemos todos los objetivos ordenados del proyecto
-        goals = list(Goal.objects.filter(project=current_goal.project).order_by('order'))
-        current_index = next((i for i, g in enumerate(goals) if g.pk == current_goal.pk), None)
+        goals = list(
+            Goal.objects.filter(project=current_goal.project).order_by("order")
+        )
+        current_index = next(
+            (i for i, g in enumerate(goals) if g.pk == current_goal.pk), None
+        )
 
         with transaction.atomic():
             if action == "up":
@@ -408,7 +453,10 @@ class GoalOrderView(LoginRequiredMixin, View):
         if current_index > 0:
             # Intercambiar con el anterior
             previous_goal = goals[current_index - 1]
-            current_goal.order, previous_goal.order = previous_goal.order, current_goal.order
+            current_goal.order, previous_goal.order = (
+                previous_goal.order,
+                current_goal.order,
+            )
             current_goal.save()
             previous_goal.save()
         else:
@@ -514,20 +562,18 @@ class GoalGenerateNewView(LoginRequiredMixin, View):
         gg = GeminiGenerator()
         goal_obj = gg.generate_goal(project, project.description, 0)
         Goal.objects.create(
-            name=goal_obj.name,
-            description=goal_obj.description,
-            project=project
+            name=goal_obj.name, description=goal_obj.description, project=project
         )
         messages.success(request, "Meta generada correctamente con IA.")
         # Mantener los parámetros GET (como page)
         params = request.GET.copy()
-        
+
         print(params)
-        url = reverse('list_goals', kwargs={'pk': pk})
+        url = reverse("list_goals", kwargs={"pk": pk})
         if params:
-            url += '?' + urlencode(params)
+            url += "?" + urlencode(params)
         return redirect(url)
-    
+
 
 class GoalOverwriteWithAIView(LoginRequiredMixin, View):
     def get(self, request, pk, goalpk, *args, **kwargs):
@@ -540,50 +586,51 @@ class GoalOverwriteWithAIView(LoginRequiredMixin, View):
         goal.save()
         messages.success(request, "Meta sobrescrita correctamente con IA.")
         return redirect(f"{reverse('list_goals', kwargs={'pk': pk})}?goal_pk={goal.pk}")
-    
 
 
 # Vistas de Proyecto
-
 class ProjectDescriptionAICreateFormView(LoginRequiredMixin, FormView):
     template_name = "view/project_description_ai_form.html"
     form_class = EmprendedorDescripcionForm
 
     def get_initial(self):
         # Recupera los datos previos de la sesión si existen
-        return self.request.session.get('project_ai_data', {})
+        return self.request.session.get("project_ai_data", {})
 
     def form_valid(self, form):
         data = form.cleaned_data
-        self.request.session['project_ai_data'] = data
-        return redirect('project_description_ai_edit')
+        self.request.session["project_ai_data"] = data
+        return redirect("project_description_ai_edit")
 
 
 class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
     template_name = "view/project_description_ai_edit.html"
-    success_url = reverse_lazy("project_list")
+    success_url = reverse_lazy("home")
 
     class EditForm(forms.Form):
-        name = forms.CharField(label="Nombre del proyecto", widget=forms.Textarea(attrs={"style": "height: 60px;"}))
-        description = forms.CharField(label="Descripción del proyecto", widget=forms.Textarea(attrs={"style": "height: 200px;"}))
+        name = forms.CharField(
+            label="Nombre del proyecto",
+            widget=forms.Textarea(attrs={"style": "height: 60px;"}),
+        )
+        description = forms.CharField(
+            label="Descripción del proyecto",
+            widget=forms.Textarea(attrs={"style": "height: 200px;"}),
+        )
 
     form_class = EditForm
 
     def get_initial(self):
-        data = self.request.session.get('project_ai_data')
+        data = self.request.session.get("project_ai_data")
         if not data:
             return {}
         gg = GeminiGenerator()
         descripcion = gg.generate_project_description(data)
-        return {
-            "name": data.get("idea", ""),
-            "description": descripcion
-        }
+        return {"name": data.get("idea", ""), "description": descripcion}
 
     def get(self, request, *args, **kwargs):
         # Si no hay datos, redirige al formulario de preguntas
-        if not self.request.session.get('project_ai_data'):
-            return redirect('project_description_ai_form')
+        if not self.request.session.get("project_ai_data"):
+            return redirect("project_description_ai_form")
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -595,7 +642,7 @@ class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
             last_modified=timezone.now(),
         )
         # Limpia la sesión
-        self.request.session.pop('project_ai_data', None)
+        self.request.session.pop("project_ai_data", None)
         messages.success(self.request, "Proyecto creado correctamente con IA.")
         return super().form_valid(form)
 
@@ -608,25 +655,20 @@ def export_project_excel(request, pk):
     ws.title = "Proyecto"
 
     # Encabezados
-    headers = ['Meta', 'Tarea', 'Duración (h)', 'Recurso(s)']
+    headers = ["Meta", "Tarea", "Duración (h)", "Recurso(s)"]
     ws.append(headers)
     for col in range(1, len(headers) + 1):
         ws[f"{get_column_letter(col)}1"].font = Font(bold=True)
 
     row_num = 2
-    for goal in project.goal_set.all().order_by('order'):
+    for goal in project.goal_set.all().order_by("order"):
         if goal.task_set.exists():
             for task in goal.task_set.all():
-                recursos = ', '.join([res.name for res in task.resources.all()])
-                ws.append([
-                    goal.name,
-                    task.name,
-                    task.duration_hours,
-                    recursos
-                ])
+                recursos = ", ".join([res.name for res in task.resources.all()])
+                ws.append([goal.name, task.name, task.duration_hours, recursos])
                 row_num += 1
         else:
-            ws.append([goal.name, '', '', ''])
+            ws.append([goal.name, "", "", ""])
             row_num += 1
 
     # Ajustar ancho de columnas
@@ -642,9 +684,11 @@ def export_project_excel(request, pk):
         ws.column_dimensions[column].width = max_length + 2
 
     response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    response['Content-Disposition'] = f'attachment; filename="proyecto_{project.id}.xlsx"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="proyecto_{project.id}.xlsx"'
+    )
     wb.save(response)
     return response
 
@@ -652,24 +696,21 @@ def export_project_excel(request, pk):
 @login_required
 def export_project_csv(request, pk):
     project = get_object_or_404(Project, pk=pk, owner=request.user)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="proyecto_{project.id}.csv"'
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        f'attachment; filename="proyecto_{project.id}.csv"'
+    )
 
     writer = csv.writer(response)
-    writer.writerow(['Meta', 'Tarea', 'Duración (h)', 'Recurso(s)'])
+    writer.writerow(["Meta", "Tarea", "Duración (h)", "Recurso(s)"])
 
-    for goal in project.goal_set.all().order_by('order'):
+    for goal in project.goal_set.all().order_by("order"):
         for task in goal.task_set.all():
-            recursos = ', '.join([res.name for res in task.resources.all()])
-            writer.writerow([
-                goal.name,
-                task.name,
-                task.duration_hours,
-                recursos
-            ])
+            recursos = ", ".join([res.name for res in task.resources.all()])
+            writer.writerow([goal.name, task.name, task.duration_hours, recursos])
         # Si una meta no tiene tareas, igual la mostramos
         if not goal.task_set.exists():
-            writer.writerow([goal.name, '', '', ''])
+            writer.writerow([goal.name, "", "", ""])
 
     return response
 
@@ -800,6 +841,3 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context["search_query"] = self.request.GET.get("search", "")
         context["current_filter"] = self.request.GET.get("filter", "")
         return context
-
-
-
