@@ -20,3 +20,4 @@ Genera exactamente una tarea para la meta indicada, siguiendo ESTE FORMATO (sin 
 2. Usa el carácter "|" como separador y nunca incluyas saltos de línea, puntos adicionales ni otros símbolos.
 3. Si no hay datos, usa: `Tarea genérica|Realizar una acción relevante para la meta|8`
 4. La descripción de la tarea debe ser breve y clara, sin detalles innecesarios.
+5. EL titulo de la tarea debe ser breve y claro, sin detalles innecesarios ni ':'.

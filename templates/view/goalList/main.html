@@ -8,9 +8,10 @@
     {% include 'view/goalList/modal/deleteTask.html' with id='deleteTaskModal' %}
   {% else %}
     {% include 'view/goalList/modal/deleteGoal.html' with id='deleteGoalModal' %}
-    {% include 'view/goalList/modal/editGoal.html' with id='updateGoalModal' %}
     {% include 'view/goalList/modal/createGoal.html' with id='createGoalModal' %}
   {% endif %}
+
+      {% include 'view/goalList/modal/editGoal.html' with id='updateGoalModal' %}
 {% endblock %}
 
 {% block sidebar %}
@@ -23,8 +24,7 @@
   {% else %}
     {# Call to action para crear una nueva meta #}
     <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
-
-    <a href="{% url 'generate_goal_new' pk=project.pk %}" class="btn btn-sm btn-secondary w-100 my-2" title="Generar meta con IA">
+    <a href="{% url 'generate_goal_new' pk=project.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-secondary w-100 my-2" title="Generar meta con IA">
       <i class="bi bi-stars me-1"></i>Generar Meta
     </a>
   {% endif %}

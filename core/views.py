@@ -1,5 +1,6 @@
 import openpyxl
 import csv
+
 from urllib.parse import urlencode
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
@@ -506,21 +507,25 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
         return redirect(reverse("list_goals", kwargs={"pk": self.kwargs.get("pk")}))
 
 
-
 class GoalGenerateNewView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         project = get_object_or_404(Project, pk=pk)
         gg = GeminiGenerator()
-        # El pk que se pasa aquí es solo para contexto, puedes pasar None o 0 si quieres
         goal_obj = gg.generate_goal(project, project.description, 0)
-        # Crea la meta en la base de datos
-        goal = Goal.objects.create(
+        Goal.objects.create(
             name=goal_obj.name,
             description=goal_obj.description,
             project=project
         )
         messages.success(request, "Meta generada correctamente con IA.")
-        return redirect(reverse('list_goals', kwargs={'pk': pk}))
+        # Mantener los parámetros GET (como page)
+        params = request.GET.copy()
+        
+        print(params)
+        url = reverse('list_goals', kwargs={'pk': pk})
+        if params:
+            url += '?' + urlencode(params)
+        return redirect(url)
     
 
 class GoalOverwriteWithAIView(LoginRequiredMixin, View):

@@ -25,7 +25,6 @@ urlpatterns = [
     path('project/<int:pk>/export/excel/', export_project_excel, name='export_project_excel'),
     path('proyecto/<int:project_id>/colaborador/eliminar/', eliminar_colaborador, name='eliminar_colaborador'),
 
-    
     # goals     
     path('project/<int:pk>/', GoalsListView.as_view(), name='list_goals'),
     path('project/<int:pk>/goal/create', GoalCreateView.as_view(), name='create_goal'),
@@ -43,7 +42,6 @@ urlpatterns = [
     path('goal/<int:goal_pk>/generatetask/', TaskGenerateView.as_view(), name='generate_task'),
     path('task/<int:task_pk>/overwrite_with_ai/', TaskOverwriteWithAIView.as_view(), name='overwrite_task_ai'),
 
-    
     # resources
     path('project/<int:project_pk>/resources/', ResourcesListView.as_view(), name='resources'),
     path('project/<int:project_pk>/resources/create', ResourceCreateView.as_view(), name='create_resource'),
@@ -56,7 +54,6 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('project/<int:pk>/export/csv/', export_project_csv, name='export_project_csv'),
 
-    
     # URLs para el restablecimiento de contraseña
     path(route='reset_password/', view=auth_views.PasswordResetView.as_view(
         template_name='view/password/reset.html'), name='reset_password'),
