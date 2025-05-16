@@ -1,0 +1,28 @@
+{% extends 'layout/app/main.html' %}
+
+{% block main %}
+  {% include 'layout/app/shared/TopNav.html' with title='Editar y confirmar proyecto' %}
+  <div class="overflow-auto p-2" style="height: 100dvh;">
+    <div style="max-width: 600px;">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+          <textarea class="form-control" id="projectName" name="name" style="height: 60px;" required>{{ form.name.value|default_if_none:"" }}</textarea>
+          <label for="projectName">Nombre del proyecto</label>
+          {% if form.name.errors %}
+            <div class="text-danger small">{{ form.name.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <div class="form-floating mb-3">
+          <textarea class="form-control" id="projectDescription" name="description" style="height: 200px;" required>{{ form.description.value|default_if_none:"" }}</textarea>
+          <label for="projectDescription">Descripción del proyecto</label>
+          {% if form.description.errors %}
+            <div class="text-danger small">{{ form.description.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <button type="submit" class="btn btn-success">Crear proyecto</button>
+        <a href="{% url 'project_description_ai_form' %}" class="btn btn-secondary">Volver a editar respuestas</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

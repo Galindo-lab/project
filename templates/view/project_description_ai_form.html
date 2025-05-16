@@ -1,0 +1,22 @@
+{% extends 'layout/app/main.html' %}
+
+{% block main %}
+  {% include 'layout/app/shared/TopNav.html' with title='Generar proyecto con IA' %}
+  <div class="overflow-auto p-2" style="height: 100dvh;">
+    <div style="max-width: 600px;">
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-floating mb-3">
+            <textarea class="form-control" id="{{ field.id_for_label }}" name="{{ field.html_name }}" style="height: 80px;" required>{{ field.value|default_if_none:"" }}</textarea>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% if field.errors %}
+              <div class="text-danger small">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Siguiente</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

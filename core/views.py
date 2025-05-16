@@ -1,3 +1,4 @@
+from django import forms
 import openpyxl
 import csv
 
@@ -25,7 +26,7 @@ from django.views import View
 from django.views.generic import ListView, CreateView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm, TaskEditForm
+from .forms import ArchiveProjectForm, CreateResourceForm, CreateTaskForm, ProjectEditForm, RegisterForm, TaskEditForm, EmprendedorDescripcionForm
 from .models import Collaborator, Goal, Project, Resource, Task
 from .generators import GeminiGenerator
 
@@ -543,6 +544,62 @@ class GoalOverwriteWithAIView(LoginRequiredMixin, View):
 
 
 # Vistas de Proyecto
+
+class ProjectDescriptionAICreateFormView(LoginRequiredMixin, FormView):
+    template_name = "view/project_description_ai_form.html"
+    form_class = EmprendedorDescripcionForm
+
+    def get_initial(self):
+        # Recupera los datos previos de la sesión si existen
+        return self.request.session.get('project_ai_data', {})
+
+    def form_valid(self, form):
+        data = form.cleaned_data
+        self.request.session['project_ai_data'] = data
+        return redirect('project_description_ai_edit')
+
+
+class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
+    template_name = "view/project_description_ai_edit.html"
+    success_url = reverse_lazy("project_list")
+
+    class EditForm(forms.Form):
+        name = forms.CharField(label="Nombre del proyecto", widget=forms.Textarea(attrs={"style": "height: 60px;"}))
+        description = forms.CharField(label="Descripción del proyecto", widget=forms.Textarea(attrs={"style": "height: 200px;"}))
+
+    form_class = EditForm
+
+    def get_initial(self):
+        data = self.request.session.get('project_ai_data')
+        if not data:
+            return {}
+        gg = GeminiGenerator()
+        descripcion = gg.generate_project_description(data)
+        return {
+            "name": data.get("idea", ""),
+            "description": descripcion
+        }
+
+    def get(self, request, *args, **kwargs):
+        # Si no hay datos, redirige al formulario de preguntas
+        if not self.request.session.get('project_ai_data'):
+            return redirect('project_description_ai_form')
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        Project.objects.create(
+            name=form.cleaned_data["name"],
+            description=form.cleaned_data["description"],
+            owner=self.request.user,
+            creation_date=timezone.now(),
+            last_modified=timezone.now(),
+        )
+        # Limpia la sesión
+        self.request.session.pop('project_ai_data', None)
+        messages.success(self.request, "Proyecto creado correctamente con IA.")
+        return super().form_valid(form)
+
+
 @login_required
 def export_project_excel(request, pk):
     project = get_object_or_404(Project, pk=pk, owner=request.user)

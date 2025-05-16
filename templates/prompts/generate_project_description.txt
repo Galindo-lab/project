@@ -1,0 +1,13 @@
+Redacta una descripción clara, atractiva y profesional para un proyecto emprendedor con la siguiente información:
+- Idea: {{ idea }}
+- Experiencia del emprendedor: {{ experiencia }}
+- Implementado hasta ahora: {{ implementado }}
+- Objetivo principal: {{ objetivo }}
+- Público objetivo: {{ publico }}
+- Problema que resuelve: {{ problema }}
+- Solución propuesta: {{ solucion }}
+- Diferenciador: {{ diferenciador }}
+- Recursos actuales: {{ recursos }}
+- Próximo paso: {{ proximo_paso }}
+
+La descripción debe ser breve (máximo 6 líneas), sin listas ni títulos, solo texto corrido, orientada a motivar y dejar claro el potencial del proyecto.

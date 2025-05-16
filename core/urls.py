@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 from project import settings
 
-from core.views import DeleteProjectView, GoalCreateView, GoalGenerateNewView, GoalOrderView, GoalOverwriteWithAIView, GoalUpdateView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, TaskGenerateView, TaskOverwriteWithAIView, UserEditView, UserListView, editar_colaborador, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
+from core.views import DeleteProjectView, GoalCreateView, GoalGenerateNewView, GoalOrderView, GoalOverwriteWithAIView, GoalUpdateView, ProjectDescriptionAICreateFormView, ProjectDescriptionAIEditView, ProjectEditView, ResourceEditView, ResourcesListView, TaskCreateView, TaskDetailView, TaskGenerateView, TaskOverwriteWithAIView, UserEditView, UserListView, editar_colaborador, eliminar_colaborador, export_project_csv, export_project_excel, index, TaskDeleteView, ResourceDeleteView, invitar_usuario, user_delete
 from core.views import register, ProjectListView, ProjectCreateView, ArchiveProjectView, GoalsListView, GoalDeleteView, ResourceCreateView
 
 urlpatterns = [
@@ -24,6 +24,8 @@ urlpatterns = [
     path('project/<int:project_id>/invite/', invitar_usuario, name='invitar_usuario'),
     path('project/<int:pk>/export/excel/', export_project_excel, name='export_project_excel'),
     path('proyecto/<int:project_id>/colaborador/eliminar/', eliminar_colaborador, name='eliminar_colaborador'),
+    path('project/description_ai/', ProjectDescriptionAICreateFormView.as_view(), name='project_description_ai_form'),
+    path('project/description_ai/edit/', ProjectDescriptionAIEditView.as_view(), name='project_description_ai_edit'),
 
     # goals     
     path('project/<int:pk>/', GoalsListView.as_view(), name='list_goals'),

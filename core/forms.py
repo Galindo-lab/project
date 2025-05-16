@@ -4,6 +4,21 @@ from django.contrib.auth.models import User
 from core.models import Goal, Project, Task, Resource
 from django.utils import timezone
 
+
+
+
+class EmprendedorDescripcionForm(forms.Form):
+    idea = forms.CharField(label="¿Cuál es tu idea de negocio o proyecto?", widget=forms.Textarea)
+    experiencia = forms.CharField(label="¿Cuál es tu nivel de experiencia en este sector?", widget=forms.Textarea)
+    implementado = forms.CharField(label="¿Qué tienes implementado hasta ahora?", widget=forms.Textarea)
+    objetivo = forms.CharField(label="¿Cuál es tu objetivo principal con este proyecto?", widget=forms.Textarea)
+    publico = forms.CharField(label="¿A quién va dirigido tu proyecto?", widget=forms.Textarea)
+    problema = forms.CharField(label="¿Qué problema resuelve tu proyecto?", widget=forms.Textarea)
+    solucion = forms.CharField(label="¿Cómo soluciona ese problema?", widget=forms.Textarea)
+    diferenciador = forms.CharField(label="¿Qué hace diferente a tu proyecto de otros?", widget=forms.Textarea)
+    recursos = forms.CharField(label="¿Con qué recursos cuentas actualmente?", widget=forms.Textarea)
+    proximo_paso = forms.CharField(label="¿Cuál es el siguiente paso que planeas dar?", widget=forms.Textarea)
+
 class TaskEditForm(forms.ModelForm):
     class Meta:
         model = Task
