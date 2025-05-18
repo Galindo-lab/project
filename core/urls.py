@@ -58,7 +58,7 @@ urlpatterns = [
         name="editar_colaborador",
     ),
     # proyect
-    path("projects/create/", ProjectCreateView.as_view(), name="project_create"),
+    path("project/create/", ProjectCreateView.as_view(), name="project_create"),
     path("project/delete/", DeleteProjectView.as_view(), name="delete_project"),
     path("project/archive/", ArchiveProjectView.as_view(), name="archive_project"),
     path(

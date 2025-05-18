@@ -860,13 +860,13 @@ class ProjectEditView(LoginRequiredMixin, View):
     template_name = "view/projectDetails/main.html"
 
     def get(self, request, pk):
-        project = get_object_or_404(Project, pk=pk, owner=request.user)
+        project = get_object_or_404(Project, pk=pk)
         form = ProjectEditForm(instance=project)
         context = {"form": form, "project": project}
         return render(request, self.template_name, context)
 
     def post(self, request, pk):
-        project = get_object_or_404(Project, pk=pk, owner=request.user)
+        project = get_object_or_404(Project, pk=pk)
         form = ProjectEditForm(request.POST, instance=project)
 
         if form.is_valid():
@@ -926,7 +926,16 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("home")
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
+        user = self.request.user
+        # Verifica si el usuario es básico y ya tiene un proyecto
+        if hasattr(user, "profile") and user.profile.account_type == "basic":
+            if Project.objects.filter(owner=user).count() >= 1:
+                messages.error(
+                    self.request,
+                    "Con una cuenta básica solo puedes crear un proyecto. Actualiza a Premium para crear más."
+                )
+                return redirect(self.success_url)
+        form.instance.owner = user
         form.instance.creation_date = timezone.now()
         form.instance.last_modified = timezone.now()
 
