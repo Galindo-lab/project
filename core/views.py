@@ -28,6 +28,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+
+from project import settings
 
 
 from .forms import (
@@ -162,8 +165,8 @@ def register(request):
     )
 
 
-def invitar_usuario(request, project_id):
-    if request.method == "POST":
+class InviteCollaboratorView(ProjectAccessMixin, LoginRequiredMixin, View):
+    def post(self, request, project_id, *args, **kwargs):
         email = request.POST.get("email")
         project = get_object_or_404(Project, id=project_id)
 
@@ -172,7 +175,6 @@ def invitar_usuario(request, project_id):
             request.user == project.owner
             and getattr(request.user, "account_type", "basic") == "basic"
         ):
-            # Excluye al dueño del conteo de colaboradores
             num_colaboradores = (
                 Collaborator.objects.filter(project=project)
                 .exclude(user=project.owner)
@@ -187,7 +189,6 @@ def invitar_usuario(request, project_id):
 
         try:
             user = User.objects.get(email=email)
-            # Verifica si ya es colaborador
             if Collaborator.objects.filter(user=user, project=project).exists():
                 messages.info(request, f"{email} ya es colaborador de este proyecto.")
             else:
@@ -197,9 +198,14 @@ def invitar_usuario(request, project_id):
                     role="Colaborador",
                     invitation_date=timezone.now(),
                 )
+                subject = "Invitación a colaborar en un proyecto"
+                message = render_to_string(
+                    "emails/colaborador_agregado.txt",
+                    {"project": project}
+                )
                 send_mail(
-                    "Invitación a colaborar en un proyecto",
-                    f'Has sido agregado como colaborador al proyecto "{project.name}".',
+                    subject,
+                    message,
                     "no-reply@tusitio.com",
                     [email],
                     fail_silently=False,
@@ -209,10 +215,14 @@ def invitar_usuario(request, project_id):
                     f"{email} ha sido agregado como colaborador y notificado por correo.",
                 )
         except User.DoesNotExist:
-            # Usuario no registrado, solo enviar invitación
+            subject = "Invitación a colaborar en un proyecto"
+            message = render_to_string(
+                "emails/invitacion_colaborador.txt",
+                {"project": project}
+            )
             send_mail(
-                "Invitación a colaborar en un proyecto",
-                f'Has sido invitado al proyecto "{project.name}". Regístrate para participar.',
+                subject,
+                message,
                 "no-reply@tusitio.com",
                 [email],
                 fail_silently=False,
@@ -265,28 +275,23 @@ class UserProfileView(LoginRequiredMixin, View):
         })
 
 
-@login_required
-def eliminar_colaborador(request, project_id):
+class CollaboratorDeleteView(ProjectAccessMixin, LoginRequiredMixin, View):
+    def post(self, request, project_id, *args, **kwargs):
+        collaborator_id = request.POST.get("collaborator_id")
+        if not collaborator_id:
+            messages.error(request, "No se especificó el colaborador a eliminar.")
+            return redirect("details_project", pk=project_id)
 
-    if request.method != "POST":
-        messages.error(request, "Operación no permitida.")
+        project = get_object_or_404(Project, id=project_id)
+        collaborator = get_object_or_404(Collaborator, id=collaborator_id, project=project)
+
+        if collaborator.user == project.owner:
+            messages.error(request, "No puedes eliminar al propietario del proyecto.")
+        else:
+            collaborator.delete()
+            messages.success(request, "Colaborador eliminado correctamente.")
+
         return redirect("details_project", pk=project_id)
-
-    collaborator_id = request.POST.get("collaborator_id")
-    if not collaborator_id:
-        messages.error(request, "No se especificó el colaborador a eliminar.")
-        return redirect("details_project", pk=project_id)
-
-    project = get_object_or_404(Project, id=project_id)
-    collaborator = get_object_or_404(Collaborator, id=collaborator_id, project=project)
-
-    if collaborator.user == project.owner:
-        messages.error(request, "No puedes eliminar al propietario del proyecto.")
-    else:
-        collaborator.delete()
-        messages.success(request, "Colaborador eliminado correctamente.")
-
-    return redirect("details_project", pk=project_id)
 
 
 # Vistas de Recursos

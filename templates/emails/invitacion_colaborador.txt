@@ -1,0 +1,2 @@
+Has sido invitado al proyecto "{{ project.name }}".
+Regístrate para participar en la plataforma.

@@ -1,0 +1,2 @@
+Has sido agregado como colaborador al proyecto "{{ project.name }}".
+¡Bienvenido!

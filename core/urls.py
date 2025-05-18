@@ -7,6 +7,7 @@ from django.contrib.auth import views as auth_views
 from project import settings
 
 from core.views import (
+    CollaboratorDeleteView,
     DeleteProjectView,
     GoalCreateView,
     GoalGenerateNewView,
@@ -27,11 +28,9 @@ from core.views import (
     UserListView,
     UserProfileView,
     editar_colaborador,
-    eliminar_colaborador,
-    index,
     TaskDeleteView,
     ResourceDeleteView,
-    invitar_usuario,
+    InviteCollaboratorView,
     user_delete,
 )
 
@@ -65,7 +64,7 @@ urlpatterns = [
     path(
         "project/<int:pk>/details/", ProjectEditView.as_view(), name="details_project"
     ),
-    path("project/<int:project_id>/invite/", invitar_usuario, name="invitar_usuario"),
+    path("project/<int:project_id>/invite/", InviteCollaboratorView.as_view(), name="invitar_usuario"),
     path(
         "proyecto/<int:pk>/exportar_excel/",
         ExportProjectExcelView.as_view(),
@@ -73,7 +72,7 @@ urlpatterns = [
     ),
     path(
         "proyecto/<int:project_id>/colaborador/eliminar/",
-        eliminar_colaborador,
+        CollaboratorDeleteView.as_view(),
         name="eliminar_colaborador",
     ),
     path(
