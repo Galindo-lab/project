@@ -1,4 +1,3 @@
-
 import openpyxl
 import csv
 
@@ -56,10 +55,10 @@ from .generators import GeminiGenerator
 
 
 
-class CollaboratorOrStaffRequiredMixin(UserPassesTestMixin):
+class ProjectAccessMixin(UserPassesTestMixin):
     """
-    Permite el acceso si el usuario es staff o colaborador del proyecto.s
-    Requiere que la vista tenga 'project_pk' o 'pk' en self.kwargs.
+    Allows access if the user is staff, owner or a collaborator of the project.
+    Requires the view to have 'project_pk' or 'pk' in self.kwargs.
     """
 
     def test_func(self):
@@ -67,14 +66,15 @@ class CollaboratorOrStaffRequiredMixin(UserPassesTestMixin):
         if user.is_staff:
             return True
 
-        # Intenta obtener el project_pk o pk de la URL
         project_pk = self.kwargs.get("project_pk") or self.kwargs.get("pk")
         if not project_pk:
             return False
 
         project = get_object_or_404(Project, pk=project_pk)
+        # Permitir acceso si es dueño o colaborador
+        if project.owner == user:
+            return True
         return Collaborator.objects.filter(user=user, project=project).exists()
-
 
 
 
@@ -751,72 +751,72 @@ class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
 
-@login_required
-def export_project_excel(request, pk):
-    project = get_object_or_404(Project, pk=pk, owner=request.user)
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Proyecto"
+class ExportProjectExcelView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        project = get_object_or_404(Project, pk=pk, owner=request.user)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Proyecto"
 
-    # Encabezados
-    headers = ["Meta", "Tarea", "Duración (h)", "Recurso(s)"]
-    ws.append(headers)
-    for col in range(1, len(headers) + 1):
-        ws[f"{get_column_letter(col)}1"].font = Font(bold=True)
+        # Encabezados
+        headers = ["Meta", "Tarea", "Duración (h)", "Recurso(s)"]
+        ws.append(headers)
+        for col in range(1, len(headers) + 1):
+            ws[f"{get_column_letter(col)}1"].font = Font(bold=True)
 
-    row_num = 2
-    for goal in project.goal_set.all().order_by("order"):
-        if goal.task_set.exists():
+        row_num = 2
+        for goal in project.goal_set.all().order_by("order"):
+            if goal.task_set.exists():
+                for task in goal.task_set.all():
+                    recursos = ", ".join([res.name for res in task.resources.all()])
+                    ws.append([goal.name, task.name, task.duration_hours, recursos])
+                    row_num += 1
+            else:
+                ws.append([goal.name, "", "", ""])
+                row_num += 1
+
+        # Ajustar ancho de columnas
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except Exception:
+                    pass
+            ws.column_dimensions[column].width = max_length + 2
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="proyecto_{project.id}.xlsx"'
+        )
+        wb.save(response)
+        return response
+
+
+class ExportProjectCSVView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        project = get_object_or_404(Project, pk=pk, owner=request.user)
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = (
+            f'attachment; filename="proyecto_{project.id}.csv"'
+        )
+
+        writer = csv.writer(response)
+        writer.writerow(["Meta", "Tarea", "Duración (h)", "Recurso(s)"])
+
+        for goal in project.goal_set.all().order_by("order"):
             for task in goal.task_set.all():
                 recursos = ", ".join([res.name for res in task.resources.all()])
-                ws.append([goal.name, task.name, task.duration_hours, recursos])
-                row_num += 1
-        else:
-            ws.append([goal.name, "", "", ""])
-            row_num += 1
+                writer.writerow([goal.name, task.name, task.duration_hours, recursos])
+            # Si una meta no tiene tareas, igual la mostramos
+            if not goal.task_set.exists():
+                writer.writerow([goal.name, "", "", ""])
 
-    # Ajustar ancho de columnas
-    for col in ws.columns:
-        max_length = 0
-        column = col[0].column_letter
-        for cell in col:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(str(cell.value))
-            except Exception:
-                pass
-        ws.column_dimensions[column].width = max_length + 2
-
-    response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    response["Content-Disposition"] = (
-        f'attachment; filename="proyecto_{project.id}.xlsx"'
-    )
-    wb.save(response)
-    return response
-
-
-@login_required
-def export_project_csv(request, pk):
-    project = get_object_or_404(Project, pk=pk, owner=request.user)
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = (
-        f'attachment; filename="proyecto_{project.id}.csv"'
-    )
-
-    writer = csv.writer(response)
-    writer.writerow(["Meta", "Tarea", "Duración (h)", "Recurso(s)"])
-
-    for goal in project.goal_set.all().order_by("order"):
-        for task in goal.task_set.all():
-            recursos = ", ".join([res.name for res in task.resources.all()])
-            writer.writerow([goal.name, task.name, task.duration_hours, recursos])
-        # Si una meta no tiene tareas, igual la mostramos
-        if not goal.task_set.exists():
-            writer.writerow([goal.name, "", "", ""])
-
-    return response
+        return response
 
 
 class ProjectEditView(LoginRequiredMixin, View):

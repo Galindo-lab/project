@@ -28,8 +28,6 @@ from core.views import (
     UserProfileView,
     editar_colaborador,
     eliminar_colaborador,
-    export_project_csv,
-    export_project_excel,
     index,
     TaskDeleteView,
     ResourceDeleteView,
@@ -45,6 +43,8 @@ from core.views import (
     GoalsListView,
     GoalDeleteView,
     ResourceCreateView,
+    ExportProjectExcelView,
+    ExportProjectCSVView,
 )
 
 urlpatterns = [
@@ -67,8 +67,8 @@ urlpatterns = [
     ),
     path("project/<int:project_id>/invite/", invitar_usuario, name="invitar_usuario"),
     path(
-        "project/<int:pk>/export/excel/",
-        export_project_excel,
+        "proyecto/<int:pk>/exportar_excel/",
+        ExportProjectExcelView.as_view(),
         name="export_project_excel",
     ),
     path(
@@ -159,7 +159,7 @@ urlpatterns = [
     ),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("register/", register, name="register"),
-    path("project/<int:pk>/export/csv/", export_project_csv, name="export_project_csv"),
+    path("project/<int:pk>/export/csv/", ExportProjectCSVView.as_view(), name="export_project_csv"),
     # URLs para el restablecimiento de contraseña
     path(
         route="reset_password/",
