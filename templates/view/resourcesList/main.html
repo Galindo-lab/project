@@ -42,11 +42,22 @@
 {% endblock %}
 
 {% block sidebar %}
-  <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createResourceModal"><i class="bi bi-plus"></i> Nuevo Recurso</button>
+  <button class="btn btn-lg btn-primary w-100 my-2 mt-1" data-bs-toggle="modal" data-bs-target="#createResourceModal"><i class="bi bi-plus"></i> Nuevo Recurso</button>
 
-  <a href="{% url 'generate_resource_ai' project.pk %}" class="btn btn-outline-primary btn-sm">
-  Generar recurso con IA
-</a>
+  <a href="{% url 'generate_resource_ai' project.pk %}" class="btn btn-sm btn-outline-primary w-100 my-1">Generar recurso con IA</a>
+
+
+
+{# Lista de metas y filtro por tipo de recurso #}
+<div class="my-2 flex-grow-1 overflow-auto">
+  <form class="list-group list-group-flush bg-transparent" method="get">
+    <button type="submit" name="type" value="" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">Todos</button>
+    {% for key, value in resource_type_choices %}
+      <button type="submit" name="type" value="{{ key }}" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">{{ value }}</button>
+    {% endfor %}
+  </form>
+</div>
+
 {% endblock %}
 
 {% block main %}

@@ -6,17 +6,12 @@
 {% endblock %}
 
 {% block sidebar %}
-
-
-        <a href="{% url 'export_project_csv' project.id %}" class="btn btn-secondary mt-3">Exportar a CSV</a>
-        <a href="{% url 'export_project_excel' project.id %}" class="btn btn-success mt-3">Exportar a Excel</a>
-
-  <div class="my-2 flex-grow-1 overflow-auto">
-    <div class="list-group list-group-flush bg-transparent">
-      <a href="#detalles" class="list-group-item list-group-item-action">Detalles del proyecto</a>
-      <a href="#invitar" class="list-group-item list-group-item-action">Invitar usuario</a>
-    </div>
-  </div>
+  <a href="{% url 'export_project_csv' project.id %}" class="btn btn-outline-secondary btn-sm mt-2">
+    <i class="bi bi-filetype-csv"></i> Exportar a CSV
+  </a>
+  <a href="{% url 'export_project_excel' project.id %}" class="btn btn-outline-secondary btn-sm mt-2">
+    <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+  </a>
 {% endblock %}
 
 {% block main %}
@@ -42,7 +37,7 @@
               <div class="text-danger">{{ form.description.errors }}</div>
             {% endif %}
           </div>
-          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="submit" class="btn btn-primary ms-auto">Guardar Cambios</button>
         </form>
       </div>
 
@@ -77,7 +72,7 @@
                   data-bs-collaborator-id="{{ collaborator.id }}"
                   data-bs-collaborator-email="{{ collaborator.user.email }}"
                 >
-                  Quitar
+                  <i class="bi-x-lg"></i>
                 </button>
               {% endif %}
             </li>

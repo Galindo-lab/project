@@ -30,9 +30,6 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 
-from project import settings
-
-
 from .forms import (
     ArchiveProjectForm,
     CreateResourceForm,
