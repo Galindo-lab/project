@@ -15,29 +15,19 @@
 {% endblock %}
 
 {% block sidebar %}
-  {% if request.GET.goal_pk %}
-    {# Crear tarea #}
-    <button data-bs-toggle="modal" data-bs-target="#createTask" class="btn btn-lg btn-primary w-100 my-2"><i class="bi bi-plus-lg"></i> Crear Tarea</button>
-
-    {# Generar tarea con IA #}
-    <a href="{% url 'generate_task' goal_pk=request.GET.goal_pk %}" class="btn btn-sm btn-outline-primary w-100 my-2" title="Generar tarea con IA"><i class="bi bi-lightning-charge me-1"></i>Generar Tarea</a>
-  {% else %}
-    {# Call to action para crear una nueva meta #}
-    <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
-    <a href="{% url 'generate_goal_new' pk=project.pk %}{% if request.GET %}
-        ?{{ request.GET.urlencode }}
-      {% endif %}"
-      class="btn btn-sm btn-outline-primary w-100 my-1"
-      title="Generar meta con IA">
-      <i class="bi bi-stars me-1"></i>Generar Meta
-    </a>
+  {% if can_edit %}
+    {% if request.GET.goal_pk %}
+      <button data-bs-toggle="modal" data-bs-target="#createTask" class="btn btn-lg btn-primary w-100 my-2"><i class="bi bi-plus-lg"></i> Crear Tarea</button>
+      <a href="{% url 'generate_task' goal_pk=request.GET.goal_pk %}" class="btn btn-sm btn-outline-primary w-100 my-2" title="Generar tarea con IA"><i class="bi bi-lightning-charge me-1"></i>Generar Tarea</a>
+    {% else %}
+      <button class="btn btn-lg btn-primary w-100 my-2" data-bs-toggle="modal" data-bs-target="#createGoalModal"><i class="bi bi-plus"></i>Nueva Meta</button>
+      <a href="{% url 'generate_goal_new' pk=project.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" class="btn btn-sm btn-outline-primary w-100 my-1" title="Generar meta con IA"><i class="bi bi-stars me-1"></i>Generar Meta</a>
+    {% endif %}
   {% endif %}
-
   {# Lista de metas #}
   <div class="my-2 flex-grow-1 overflow-auto">
     <form class="list-group list-group-flush bg-transparent">
       <button type="submit" name="goal_pk" value="" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">Todos</button>
-
       {% for goal in project.goal_set.all %}
         <button type="submit" name="goal_pk" value="{{ goal.pk }}" class="bg-transparent list-group-item list-group-item-action d-flex justify-content-between align-items-center">{{ goal.name }}</button>
       {% endfor %}
@@ -61,43 +51,32 @@
       <div class="card mb-2">
         <div class="card-header{% if not request.GET.goal_pk %} border-0{% endif %}">
           <div class="d-flex align-items-center mb-1 justify-content-between">
-            {# Nombre de la meta #}
             <div>
               <a href="?goal_pk={{ goal.pk }}" class="mb-0 link-underline fw-medium link-underline-opacity-0{% if request.GET.goal_pk %} text-body{% endif %}">{{ goal.name }}</a>
               <p class="small mb-0" style="max-width: 700px;">{{ goal.description }}</p>
             </div>
-
-            {# Barra de progreso movida aquí y oculta en móvil #}
             <div class="d-none d-md-block">
-              {% if not request.GET.goal_pk %}
-                <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='up' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></a>
-                <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='down' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></a>
-
-                {# delete #}
-                <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal" data-bs-goal-id="{{ goal.pk }}" data-bs-goal-name="{{ goal.name }}"><i class="bi bi-trash"></i></button>
+              {% if can_edit %}
+                {% if not request.GET.goal_pk %}
+                  <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='up' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-up"></i></a>
+                  <a href="{% url 'order_goal' pk=project.pk goalpk=goal.pk action='down' %}" class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-arrow-down"></i></a>
+                  <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#deleteGoalModal" data-bs-goal-id="{{ goal.pk }}" data-bs-goal-name="{{ goal.name }}"><i class="bi bi-trash"></i></button>
+                {% endif %}
+                <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
+                <a href="{% url 'overwrite_goal_ai' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
               {% endif %}
-
-              {# editar #}
-              <button class="btn btn-outline-secondary btn-sm border-0" data-bs-toggle="modal" data-bs-target="#updateGoalModal" data-bs-goal-id="{{ goal.id }}" data-bs-goal-name="{{ goal.name }}" data-bs-goal-description="{{ goal.description|default:'' }}"><i class="bi bi-pencil"></i></button>
-
-              {# IA #}
-              <a href="{% url 'overwrite_goal_ai' pk=project.pk goalpk=goal.pk %}" class="btn btn-outline-warning btn-sm border-0"><i class="bi bi-stars"></i></a>
             </div>
           </div>
         </div>
-
-        {# Lista de tareas flushed #}
         {% if request.GET.goal_pk or request.GET.search %}
           <ul class="list-group list-group-flush">
             {% if request.GET.search %}
               {% for task in goal.filtered_tasks %}
-                {# Mostrar todas las metas que coincidan con las busqueda #}
-                {% include 'view/goalList/component/taskEntry.html' with task=task %}
+                {% include 'view/goalList/component/taskEntry.html' with task=task can_edit=can_edit %}
               {% endfor %}
             {% else %}
               {% for task in goal.task_set.all %}
-                {# Mostrar todas las tareas en una meta #}
-                {% include 'view/goalList/component/taskEntry.html' with task=task %}
+                {% include 'view/goalList/component/taskEntry.html' with task=task can_edit=can_edit %}
               {% endfor %}
             {% endif %}
           </ul>
@@ -105,7 +84,6 @@
       </div>
     {% endfor %}
   </div>
-
   {% include 'layout/app/shared/Pagination.html' with class='justify-content-start m-2' %}
-    {% include 'layout/bottomNav.html' %}
+  {% include 'layout/bottomNav.html' %}
 {% endblock %}

@@ -553,6 +553,14 @@ class GoalsListView(LoginRequiredMixin, ListView):
         context["project"] = self.project
         context["search_query"] = self.request.GET.get("search", "")
 
+        # Permisos de edición
+        user = self.request.user
+        if self.project.owner == user:
+            context["can_edit"] = True
+        else:
+            collaborator = Collaborator.objects.filter(user=user, project=self.project).first()
+            context["can_edit"] = collaborator and collaborator.role == Collaborator.Permissions.Edit
+
         # Filtrar las tareas de cada meta según el término de búsqueda
         search_query = self.request.GET.get("search", "").strip()
         if search_query:
