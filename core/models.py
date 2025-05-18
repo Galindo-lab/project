@@ -3,13 +3,15 @@ from django.contrib.auth.models import User
 
 
 class Profile(models.Model):
+
     class AccountType(models.TextChoices):
         BASIC = "basic", "Basic"
         PREMIUM = "premium", "Premium"
-
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default=0, related_name='profile')
     account_type = models.CharField(max_length=10, choices=AccountType.choices)
-    monthly_cost = models.DecimalField(max_digits=10, decimal_places=2)
-
+    monthly_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
     def __str__(self):
         return self.account_type
 

@@ -1,8 +1,32 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from core.models import Goal, Project, Task, Resource
+from core.models import Goal, Profile, Project, Task, Resource
 from django.utils import timezone
+
+class UserEditWithProfileForm(forms.ModelForm):
+    account_type = forms.ChoiceField(
+        choices=Profile.AccountType.choices,
+        label="Tipo de cuenta"
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "is_active", "is_staff"]
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.get('instance')
+        super().__init__(*args, **kwargs)
+        if user and hasattr(user, 'profile'):
+            self.fields['account_type'].initial = user.profile.account_type
+
+    def save(self, commit=True):
+        user = super().save(commit)
+        account_type = self.cleaned_data['account_type']
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.account_type = account_type
+        profile.save()
+        return user
 
 
 class UserProfileForm(forms.ModelForm):

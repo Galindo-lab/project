@@ -42,6 +42,7 @@ from .forms import (
     RegisterForm,
     TaskEditForm,
     EmprendedorDescripcionForm,
+    UserEditWithProfileForm,
     UserProfileForm,
 )
 
@@ -109,6 +110,8 @@ class UserListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         search_query = self.request.GET.get("search", "").strip()
+        status = self.request.GET.get("status", "")
+
         if search_query:
             queryset = queryset.filter(
                 Q(username__icontains=search_query)
@@ -116,18 +119,31 @@ class UserListView(ListView):
                 | Q(first_name__icontains=search_query)
                 | Q(last_name__icontains=search_query)
             )
+        if status == "activo":
+            queryset = queryset.filter(is_active=True)
+        elif status == "suspendido":
+            queryset = queryset.filter(is_active=False)
+        elif status == "eliminado":
+            queryset = queryset.filter(is_active=False)  # Ajusta si tienes un campo especial para "eliminado"
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["current_status"] = self.request.GET.get("status", "")
+        return context
 
 
 @login_required
 def user_delete(request, pk):
     user = get_object_or_404(User, pk=pk)
     if request.method == "POST":
-        user.is_active = False
-        user.save()
-        messages.success(request, "Usuario deshabilitado correctamente.")
+        user.delete()
+        messages.success(request, "Usuario eliminado correctamente.")
         return redirect("user_list")
     return render(request, "view/userList/modal/deleteUser.html", {"user": user})
+
+
+
 
 
 @login_required
@@ -140,7 +156,7 @@ def index(request):
 
 class UserEditView(UpdateView):
     model = User
-    fields = ["username", "first_name", "last_name", "email", "is_active", "is_staff"]
+    form_class = UserEditWithProfileForm
     template_name = "view/userList/editUser.html"
     success_url = reverse_lazy("user_list")
 

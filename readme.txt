@@ -1,9 +1,3 @@
-# panel de admnistrador
-- Como [[#Administrador del Sistema]], quiero poder filtrar usuarios por estado (activo, suspendido, eliminado).
-- Como [[#Administrador del Sistema]], quiero poder editar la información de un usuario (ej.: nombre, correo, estado).
-- Como [[#Administrador del Sistema]], quiero poder eliminar permanentemente la cuenta de un usuario.
-- Como [[#Administrador del Sistema]], quiero poder camiar el tipo de cuenta de un usuario (premium o basica). 
-
 # Gestión de proyectos
 - Como [[#Usuario Premium]], quiero poder crear más de un proyecto.
 - Como [[#Usuario]], quiero poder poder agregar dos colaboradores extra al proyecto.

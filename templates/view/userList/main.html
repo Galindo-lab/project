@@ -2,8 +2,24 @@
 
 {% block modals %}
   {% include 'layout/app/shared/Messages.html' %}
-
 {% endblock modals %}
+
+{% block sidebar %}
+{# Aqui va el filtro #}
+<form method="get" class="mb-3">
+  <label for="status" class="form-label">Filtrar por estado:</label>
+  <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+    <option value="">Todos</option>
+    <option value="activo" {% if current_status == "activo" %}selected{% endif %}>Activo</option>
+    <option value="suspendido" {% if current_status == "suspendido" %}selected{% endif %}>Suspendido</option>
+    <option value="eliminado" {% if current_status == "eliminado" %}selected{% endif %}>Eliminado</option>
+  </select>
+  {# Si tienes búsqueda, conserva el valor #}
+  {% if request.GET.search %}
+    <input type="hidden" name="search" value="{{ request.GET.search }}">
+  {% endif %}
+</form>
+{% endblock sidebar %}
 
 {% block main %}
   {% include 'layout/app/shared/TopNav.html' with title='Lista de usuarios' %}
@@ -15,7 +31,6 @@
         <th>Email</th>
         <th>Activo</th>
         <th>Staff</th>
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -25,9 +40,6 @@
         <td>{{ user.email }}</td>
         <td>{{ user.is_active|yesno:"Sí,No" }}</td>
         <td>{{ user.is_staff|yesno:"Sí,No" }}</td>
-        <td>
-          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-bs-user-id="{{ user.id }}" data-bs-user-name="{{ user.username }}">Eliminar</button>
-        </td>
       </tr>
       {% endfor %}
     </tbody>

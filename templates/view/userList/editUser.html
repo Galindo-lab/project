@@ -1,5 +1,10 @@
 {% extends 'layout/app/main.html' %}
 
+{% block modals %}
+  {% include 'layout/app/shared/Messages.html' %}
+  {% include 'view/userList/modal/deleteUser.html' with id='deleteUserModal' %}
+{% endblock modals %}
+
 {% block main %}
   <h2>Editar usuario</h2>
   <form method="post">
@@ -8,6 +13,8 @@
     <button type="submit" class="btn btn-primary">Guardar cambios</button>
     <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancelar</a>
   </form>
+
+  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" data-bs-user-id="{{ user.id }}" data-bs-user-name="{{ user.username }}">Eliminar</button>
   
   <h3>Proyectos de este usuario</h3>
   {% if projects %}
