@@ -24,7 +24,8 @@
 {% block main %}
   {% include 'layout/app/shared/TopNav.html' with title='Lista de usuarios' %}
 
-  <table class="table">
+<div class="p-2">
+    <table class="table">
     <thead>
       <tr>
         <th>Usuario</th>
@@ -46,4 +47,7 @@
   </table>
   {% include 'layout/app/shared/Pagination.html' with page_obj=users %}
   {% include 'view/userList/modal/deleteUser.html' with id='deleteUserModal' %}
+</div>
+  
+
 {% endblock %}
