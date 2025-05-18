@@ -964,7 +964,11 @@ class ProjectListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(owner=self.request.user)
+        user = self.request.user
+        # Mostrar proyectos donde soy dueño o colaborador
+        queryset = Project.objects.filter(
+            Q(owner=user) | Q(collaborator__user=user)
+        ).distinct()
         search_query = self.request.GET.get("search", "").strip()
 
         if self.request.GET.get("filter") == "archived":
