@@ -390,9 +390,16 @@ class ResourcesListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
         context["project"] = project
-        context["resource_type_choices"] = (
-            Resource.ResourceType.choices
-        )  # Agregar las opciones de tipo de recurso
+        context["resource_type_choices"] = Resource.ResourceType.choices
+
+        # Permisos de edición
+        user = self.request.user
+        if project.owner == user:
+            context["can_edit"] = True
+        else:
+            collaborator = Collaborator.objects.filter(user=user, project=project).first()
+            context["can_edit"] = collaborator and collaborator.role == Collaborator.Permissions.Edit
+
         return context
 
 
