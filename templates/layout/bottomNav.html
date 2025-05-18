@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-around align-items-end bg-body d-lg-none">
-  <a href="#" class="col-3 text-center btn btn-sm py-2">
+  <a href="{% url 'list_goals' pk=project.pk %}" class="col-3 text-center btn btn-sm py-2">
     <div class="rounded-pill pt-2 pb-1 bg-primary-subtle text-primary-emphasis">
       <div class="position-relative">
         <i class="bi bi-house h4"></i>
@@ -8,7 +8,7 @@
     <span class="small text-truncate fw-medium">Tareas</span>
   </a>
 
-  <a href="#" class="col-3 text-center btn btn-sm py-2">
+  <a href="{% url 'resources' project_pk=project.pk %}" class="col-3 text-center btn btn-sm py-2">
     <div class="rounded-pill pt-2 pb-1 text-muted">
       <div class="position-relative">
         <i class="bi bi-gear h4"></i>
@@ -17,7 +17,7 @@
     <span class="small text-truncate">Recursos</span>
   </a>
 
-  <a href="#" class="col-3 text-center btn btn-sm py-2">
+  <a href="{% url 'details_project' pk=project.pk %}" class="col-3 text-center btn btn-sm py-2">
     <div class="rounded-pill pt-2 pb-1 text-muted">
       <div class="position-relative">
         <i class="bi bi-bell h4"></i>
