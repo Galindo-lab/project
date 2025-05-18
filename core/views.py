@@ -149,6 +149,7 @@ class UserEditView(UpdateView):
         context["projects"] = Project.objects.filter(owner=self.object)
         return context
 
+
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -170,68 +171,83 @@ class InviteCollaboratorView(ProjectAccessMixin, LoginRequiredMixin, View):
         email = request.POST.get("email")
         project = get_object_or_404(Project, id=project_id)
 
-        # Restricción para cuentas básicas
-        if (
-            request.user == project.owner
-            and getattr(request.user, "account_type", "basic") == "basic"
-        ):
-            num_colaboradores = (
-                Collaborator.objects.filter(project=project)
-                .exclude(user=project.owner)
-                .count()
+        if self._is_basic_account_limit_reached(request.user, project):
+            messages.error(
+                request,
+                "Con una cuenta básica solo puedes agregar un colaborador a tu proyecto.",
             )
-            if num_colaboradores >= 1:
-                messages.error(
-                    request,
-                    "Con una cuenta básica solo puedes agregar un colaborador a tu proyecto.",
-                )
-                return redirect("details_project", pk=project.id)
+            return redirect("details_project", pk=project.id)
 
-        try:
-            user = User.objects.get(email=email)
-            if Collaborator.objects.filter(user=user, project=project).exists():
+        user = self._get_user_by_email(email)
+        if user:
+            if self._is_already_collaborator(user, project):
                 messages.info(request, f"{email} ya es colaborador de este proyecto.")
             else:
-                Collaborator.objects.create(
-                    user=user,
-                    project=project,
-                    role="Colaborador",
-                    invitation_date=timezone.now(),
-                )
-                subject = "Invitación a colaborar en un proyecto"
-                message = render_to_string(
-                    "emails/colaborador_agregado.txt",
-                    {"project": project}
-                )
-                send_mail(
-                    subject,
-                    message,
-                    "no-reply@tusitio.com",
-                    [email],
-                    fail_silently=False,
-                )
-                messages.success(
-                    request,
-                    f"{email} ha sido agregado como colaborador y notificado por correo.",
-                )
-        except User.DoesNotExist:
-            subject = "Invitación a colaborar en un proyecto"
-            message = render_to_string(
-                "emails/invitacion_colaborador.txt",
-                {"project": project}
-            )
-            send_mail(
-                subject,
-                message,
-                "no-reply@tusitio.com",
-                [email],
-                fail_silently=False,
-            )
-            messages.success(
-                request,
-                f"Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.",
-            )
+                self._add_collaborator(user, project, email, request)
+        else:
+            self._send_invitation_email(email, project, request)
+
         return redirect("details_project", pk=project.id)
+
+    def _is_basic_account_limit_reached(self, user, project):
+        return (
+            user == project.owner
+            and getattr(user, "account_type", "basic") == "basic"
+            and Collaborator.objects.filter(project=project)
+                .exclude(user=project.owner)
+                .count() >= 1
+        )
+
+    def _get_user_by_email(self, email):
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            return None
+
+    def _is_already_collaborator(self, user, project):
+        return Collaborator.objects.filter(user=user, project=project).exists()
+
+    def _add_collaborator(self, user, project, email, request):
+        Collaborator.objects.create(
+            user=user,
+            project=project,
+            role="Colaborador",
+            invitation_date=timezone.now(),
+        )
+        subject = "Invitación a colaborar en un proyecto"
+        message = render_to_string(
+            "emails/colaborador_agregado.txt",
+            {"project": project}
+        )
+        send_mail(
+            subject,
+            message,
+            "no-reply@tusitio.com",
+            [email],
+            fail_silently=False,
+        )
+        messages.success(
+            request,
+            f"{email} ha sido agregado como colaborador y notificado por correo.",
+        )
+
+    def _send_invitation_email(self, email, project, request):
+        subject = "Invitación a colaborar en un proyecto"
+        message = render_to_string(
+            "emails/invitacion_colaborador.txt",
+            {"project": project}
+        )
+        send_mail(
+            subject,
+            message,
+            "no-reply@tusitio.com",
+            [email],
+            fail_silently=False,
+        )
+        messages.success(
+            request,
+            f"Se ha enviado una invitación a {email}. Cuando se registre, podrá ser agregado como colaborador.",
+        )
 
 
 class UserProfileView(LoginRequiredMixin, View):
