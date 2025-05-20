@@ -30,6 +30,8 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 
+from project.settings import EMAIL_HOST_USER
+
 from .forms import (
     ArchiveProjectForm,
     CreateResourceForm,
@@ -235,7 +237,7 @@ class InviteCollaboratorView(ProjectAccessMixin, LoginRequiredMixin, View):
         send_mail(
             subject,
             message,
-            "no-reply@tusitio.com",
+            EMAIL_HOST_USER,
             [email],
             fail_silently=False,
         )
@@ -253,7 +255,7 @@ class InviteCollaboratorView(ProjectAccessMixin, LoginRequiredMixin, View):
         send_mail(
             subject,
             message,
-            "no-reply@tusitio.com",
+            EMAIL_HOST_USER,
             [email],
             fail_silently=False,
         )
