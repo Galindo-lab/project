@@ -96,15 +96,15 @@
 
               <a 
           href="{% url 'generate_task' goal_pk=request.GET.goal_pk %}"
-          class="btn btn-secondary btn-sm shadow position-fixed" 
-          style="bottom: 6.5rem; right: 2.6rem; z-index: 1050;" 
+          class="btn btn-secondary btn-sm shadow position-fixed d-lg-none" 
+          style="bottom: 10.5rem; right: 1.6rem; z-index: 1050;" 
           title="Quiz">
           <i class="bi bi-lightning-charge"></i>
         </a>
 
       <button 
-        class="btn btn-primary btn-lg shadow position-fixed" 
-        style="bottom: 2rem; right: 2rem; z-index: 1050;" 
+        class="btn btn-primary btn-lg shadow position-fixed d-lg-none" 
+        style="bottom: 5em; right: 1rem; z-index: 1050;" 
         data-bs-toggle="modal" 
         data-bs-target="#createTask"
         title="Nueva Tarea">
@@ -116,15 +116,15 @@
         <!-- Botón flotante pequeño para el Quiz -->
         <a 
           href="{% url 'generate_goal_new' pk=project.pk %}" 
-          class="btn btn-secondary btn-sm shadow position-fixed" 
-          style="bottom: 6.5rem; right: 2.6rem; z-index: 1050;" 
+          class="btn btn-secondary btn-sm shadow position-fixed d-lg-none" 
+          style="bottom: 10.5rem; right: 1.6rem; z-index: 1050;" 
           title="Quiz">
           <i class="bi bi-lightning-charge"></i>
         </a>
 
       <button 
-        class="btn btn-primary btn-lg shadow position-fixed" 
-        style="bottom: 2rem; right: 2rem; z-index: 1050;" 
+        class="btn btn-primary btn-lg shadow position-fixed d-lg-none" 
+        style="bottom: 6rem; right: 1rem; z-index: 1050;" 
         data-bs-toggle="modal" 
         data-bs-target="#createGoalModal"
         title="Nueva Meta">
