@@ -105,4 +105,24 @@
 
   
     {% include 'layout/app/shared/Pagination.html' with class='justify-content-start mt-2 mb-2' %}
+
+  <!-- Botón flotante pequeño para el Quiz -->
+  <a 
+    href="{% url 'project_description_ai_form' %}" 
+    class="btn btn-secondary btn-sm shadow position-fixed" 
+    style="bottom: 6.5rem; right: 2.6rem; z-index: 1050;" 
+    title="Quiz">
+    <i class="bi bi-lightning-charge"></i>
+  </a>
+
+  <!-- Botón flotante para crear proyecto -->
+  <button 
+    class="btn btn-primary btn-lg shadow position-fixed" 
+    style="bottom: 2rem; right: 2rem; z-index: 1050;" 
+    data-bs-toggle="modal" 
+    data-bs-target="#createProjectModal"
+    title="Nuevo Proyecto">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+
 {% endblock %}
