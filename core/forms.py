@@ -49,7 +49,7 @@ class EmprendedorDescripcionForm(forms.Form):
     solucion = forms.CharField(label="¿Cómo soluciona ese problema?", widget=forms.Textarea)
     diferenciador = forms.CharField(label="¿Qué hace diferente a tu proyecto de otros?", widget=forms.Textarea)
     recursos = forms.CharField(label="¿Con qué recursos cuentas actualmente?", widget=forms.Textarea)
-    proximo_paso = forms.CharField(label="¿Cuál es el siguiente paso que planeas dar?", widget=forms.Textarea)
+    proximo_paso = forms.CharField(label="Describe tu proyecto brevemente", widget=forms.Textarea)
 
 class TaskEditForm(forms.ModelForm):
     class Meta:
