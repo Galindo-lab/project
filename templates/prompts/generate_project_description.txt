@@ -8,6 +8,10 @@ Redacta una descripción clara, atractiva y profesional para un proyecto emprend
 - Solución propuesta: {{ solucion }}
 - Diferenciador: {{ diferenciador }}
 - Recursos actuales: {{ recursos }}
-- Próximo paso: {{ proximo_paso }}
+- descripcion del proyecto: {{ proximo_paso }}
 
-La descripción debe ser breve (máximo 6 líneas), sin listas ni títulos, solo texto corrido, orientada a motivar y dejar claro el potencial del proyecto.
+**Reglas estrictas:**
+- La descripción debe ser breve (máximo 5 líneas)
+- sin listas ni títulos
+- solo texto corrido
+- debe ser una descipcion tipo "proyecto es un ... que busca ..."

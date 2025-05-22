@@ -763,7 +763,6 @@ class ProjectDescriptionAICreateFormView(LoginRequiredMixin, FormView):
     form_class = EmprendedorDescripcionForm
 
     def get_initial(self):
-        # Recupera los datos previos de la sesión si existen
         return self.request.session.get("project_ai_data", {})
 
     def form_valid(self, form):
@@ -795,10 +794,10 @@ class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
         try:
             gg = GeminiGenerator()
             descripcion = gg.generate_project_description(data)
-            return {"name": data.get("idea", ""), "description": descripcion}
+            return {"name": data.get("nombre", ""), "description": descripcion}
         except Exception as e:
             messages.error(self.request, f"Error al generar descripción con IA: {str(e)}")
-            return {"name": data.get("idea", ""), "description": ""}
+            return {"name": data.get("nombre", ""), "description": ""}
 
     def get(self, request, *args, **kwargs):
         if not self.request.session.get("project_ai_data"):

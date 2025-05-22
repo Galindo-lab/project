@@ -40,6 +40,7 @@ class PasswordChangeCustomForm(forms.Form):
     new_password2 = forms.CharField(label="Confirmar nueva contraseña", widget=forms.PasswordInput)
 
 class EmprendedorDescripcionForm(forms.Form):
+    nombre = forms.CharField(label="Nombre del proyecto", widget=forms.Textarea)
     idea = forms.CharField(label="¿Cuál es tu idea de negocio o proyecto?", widget=forms.Textarea)
     experiencia = forms.CharField(label="¿Cuál es tu nivel de experiencia en este sector?", widget=forms.Textarea)
     implementado = forms.CharField(label="¿Qué tienes implementado hasta ahora?", widget=forms.Textarea)
