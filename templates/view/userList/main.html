@@ -2,6 +2,7 @@
 
 {% block modals %}
   {% include 'layout/app/shared/Messages.html' %}
+  {% include 'view/userList/modal/deleteUser.html' with id='deleteUserModal' %}
 {% endblock modals %}
 
 {% block sidebar %}
@@ -24,7 +25,7 @@
 {% block main %}
   {% include 'layout/app/shared/TopNav.html' with title='Lista de usuarios' %}
 
-<div class="p-2">
+  <div class="overflow-auto p-2" style="height: 100dvh;">
     <table class="table">
     <thead>
       <tr>
@@ -45,8 +46,7 @@
       {% endfor %}
     </tbody>
   </table>
-  {% include 'layout/app/shared/Pagination.html' with page_obj=users %}
-  {% include 'view/userList/modal/deleteUser.html' with id='deleteUserModal' %}
+  {% include 'layout/app/shared/Pagination.html' with class='justify-content-start m-2' %}
 </div>
   
 

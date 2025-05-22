@@ -552,7 +552,6 @@ class GoalsListView(LoginRequiredMixin, ListView):
             queryset = Goal.objects.filter(project=self.project).order_by("order")
 
         if search_query:
-            # Filtrar metas que tienen tareas que coinciden con el término de búsqueda
             queryset = queryset.filter(task__name__icontains=search_query).distinct()
 
         return queryset
@@ -572,12 +571,14 @@ class GoalsListView(LoginRequiredMixin, ListView):
 
         # Filtrar las tareas de cada meta según el término de búsqueda
         search_query = self.request.GET.get("search", "").strip()
-        if search_query:
-            for goal in context["goals"]:
+        for goal in context["goals"]:
+            if search_query:
                 goal.filtered_tasks = goal.task_set.filter(name__icontains=search_query)
-        else:
-            for goal in context["goals"]:
+            else:
                 goal.filtered_tasks = goal.task_set.all()
+            # Agrega los contadores para el template
+            goal.total_tasks = goal.task_set.count()
+            goal.completed_tasks = goal.task_set.filter(status="completed").count()
 
         return context
 
