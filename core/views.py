@@ -413,17 +413,20 @@ class ResourcesListView(LoginRequiredMixin, ListView):
 class ResourceGenerateAIView(LoginRequiredMixin, View):
     def get(self, request, project_pk, *args, **kwargs):
         project = get_object_or_404(Project, pk=project_pk)
-        gg = GeminiGenerator()
-        resource_data = gg.generate_resource(project, project.description)
-        # Crea el recurso en la base de datos
-        Resource.objects.create(
-            name=resource_data["name"],
-            type=resource_data["type"],
-            cost_per_hour=resource_data["cost_per_hour"],
-            project=project,
-        )
-        messages.success(request, "Recurso generado correctamente con IA.")
+        try:
+            gg = GeminiGenerator()
+            resource_data = gg.generate_resource(project, project.description)
+            Resource.objects.create(
+                name=resource_data["name"],
+                type=resource_data["type"],
+                cost_per_hour=resource_data["cost_per_hour"],
+                project=project,
+            )
+            messages.success(request, "Recurso generado correctamente con IA.")
+        except Exception as e:
+            messages.error(request, f"Error al generar recurso con IA: {str(e)}")
         return redirect(reverse("resources", kwargs={"project_pk": project.pk}))
+
 
 # Vistas de Tareas
 class TaskDetailView(LoginRequiredMixin, UpdateView):
@@ -504,18 +507,19 @@ class TaskGenerateView(LoginRequiredMixin, View):
     def get(self, request, goal_pk, *args, **kwargs):
         goal = get_object_or_404(Goal, pk=goal_pk)
         project = goal.project
-        gg = GeminiGenerator()
-        task_data = gg.generate_task(goal, project.description)
-        # Crea la tarea en la base de datos
-        from .models import Task
-
-        task = Task.objects.create(
-            name=task_data["name"],
-            description=task_data["description"],
-            duration_hours=task_data["duration_hours"],
-            goal=goal,
-        )
-        messages.success(request, "Tarea generada correctamente!")
+        try:
+            gg = GeminiGenerator()
+            task_data = gg.generate_task(goal, project.description)
+            from .models import Task
+            Task.objects.create(
+                name=task_data["name"],
+                description=task_data["description"],
+                duration_hours=task_data["duration_hours"],
+                goal=goal,
+            )
+            messages.success(request, "Tarea generada correctamente!")
+        except Exception as e:
+            messages.error(request, f"Error al generar tarea con IA: {str(e)}")
         return redirect(
             f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}"
         )
@@ -526,15 +530,16 @@ class TaskOverwriteWithAIView(LoginRequiredMixin, View):
         task = get_object_or_404(Task, pk=task_pk)
         goal = task.goal
         project = goal.project
-        gg = GeminiGenerator()
-        # Genera nuevos datos para la tarea usando el contexto actual
-        task_data = gg.generate_task(goal, project.description)
-        # Sobrescribe los datos de la tarea
-        task.name = task_data["name"]
-        task.description = task_data["description"]
-        task.duration_hours = task_data["duration_hours"]
-        task.save()
-        messages.success(request, "Tarea sobrescrita con IA correctamente!")
+        try:
+            gg = GeminiGenerator()
+            task_data = gg.generate_task(goal, project.description)
+            task.name = task_data["name"]
+            task.description = task_data["description"]
+            task.duration_hours = task_data["duration_hours"]
+            task.save()
+            messages.success(request, "Tarea sobrescrita con IA correctamente!")
+        except Exception as e:
+            messages.error(request, f"Error al sobrescribir tarea con IA: {str(e)}")
         return redirect(
             f"{reverse('list_goals', kwargs={'pk': project.pk})}?goal_pk={goal.pk}"
         )
@@ -720,16 +725,16 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
 class GoalGenerateNewView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         project = get_object_or_404(Project, pk=pk)
-        gg = GeminiGenerator()
-        goal_obj = gg.generate_goal(project, project.description, 0)
-        Goal.objects.create(
-            name=goal_obj.name, description=goal_obj.description, project=project
-        )
-        messages.success(request, "Meta generada correctamente con IA.")
-        # Mantener los parámetros GET (como page)
+        try:
+            gg = GeminiGenerator()
+            goal_obj = gg.generate_goal(project, project.description, 0)
+            Goal.objects.create(
+                name=goal_obj.name, description=goal_obj.description, project=project
+            )
+            messages.success(request, "Meta generada correctamente con IA.")
+        except Exception as e:
+            messages.error(request, f"Error al generar meta con IA: {str(e)}")
         params = request.GET.copy()
-
-        print(params)
         url = reverse("list_goals", kwargs={"pk": pk})
         if params:
             url += "?" + urlencode(params)
@@ -740,12 +745,15 @@ class GoalOverwriteWithAIView(LoginRequiredMixin, View):
     def get(self, request, pk, goalpk, *args, **kwargs):
         project = get_object_or_404(Project, pk=pk)
         goal = get_object_or_404(Goal, pk=goalpk, project=project)
-        gg = GeminiGenerator()
-        goal2 = gg.generate_goal(project, project.description, goalpk)
-        goal.name = goal2.name
-        goal.description = goal2.description
-        goal.save()
-        messages.success(request, "Meta sobrescrita correctamente con IA.")
+        try:
+            gg = GeminiGenerator()
+            goal2 = gg.generate_goal(project, project.description, goalpk)
+            goal.name = goal2.name
+            goal.description = goal2.description
+            goal.save()
+            messages.success(request, "Meta sobrescrita correctamente con IA.")
+        except Exception as e:
+            messages.error(request, f"Error al sobrescribir meta con IA: {str(e)}")
         return redirect(f"{reverse('list_goals', kwargs={'pk': pk})}?goal_pk={goal.pk}")
 
 
@@ -784,12 +792,15 @@ class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
         data = self.request.session.get("project_ai_data")
         if not data:
             return {}
-        gg = GeminiGenerator()
-        descripcion = gg.generate_project_description(data)
-        return {"name": data.get("idea", ""), "description": descripcion}
+        try:
+            gg = GeminiGenerator()
+            descripcion = gg.generate_project_description(data)
+            return {"name": data.get("idea", ""), "description": descripcion}
+        except Exception as e:
+            messages.error(self.request, f"Error al generar descripción con IA: {str(e)}")
+            return {"name": data.get("idea", ""), "description": ""}
 
     def get(self, request, *args, **kwargs):
-        # Si no hay datos, redirige al formulario de preguntas
         if not self.request.session.get("project_ai_data"):
             return redirect("project_description_ai_form")
         return super().get(request, *args, **kwargs)
@@ -802,7 +813,6 @@ class ProjectDescriptionAIEditView(LoginRequiredMixin, FormView):
             creation_date=timezone.now(),
             last_modified=timezone.now(),
         )
-        # Limpia la sesión
         self.request.session.pop("project_ai_data", None)
         messages.success(self.request, "Proyecto creado correctamente con IA.")
         return super().form_valid(form)

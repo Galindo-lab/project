@@ -1,0 +1,23 @@
+# Checklist de Features del Programa
+
+- [ ] Registro de usuarios
+- [ ] Inicio y cierre de sesión
+- [ ] Edición de perfil y cambio de contraseña
+- [ ] Listado, edición y eliminación de usuarios
+- [ ] Creación, edición, archivado y eliminación de proyectos
+- [ ] Listado y filtrado de proyectos (activos/archivados/búsqueda)
+- [ ] Generación de descripción de proyecto con IA
+- [ ] Exportación de proyectos a Excel y CSV
+- [ ] Gestión de colaboradores (invitar, agregar, eliminar, roles)
+- [ ] Límite de colaboradores para cuentas básicas
+- [ ] Gestión de recursos (crear, editar, eliminar, listar)
+- [ ] Generación de recursos con IA
+- [ ] Gestión de metas/objetivos (crear, editar, eliminar, reordenar, listar)
+- [ ] Generación y sobrescritura de metas con IA
+- [ ] Gestión de tareas (crear, editar, eliminar, listar)
+- [ ] Generación y sobrescritura de tareas con IA
+- [ ] Asignación de recursos a tareas
+- [ ] Paginación en listados
+- [ ] Mensajes de éxito y error en todas las acciones
+- [ ] Permisos según tipo de usuario (dueño, colaborador, staff)
+- [ ] Soporte para cuentas básicas y premium
