@@ -47,6 +47,7 @@ from core.views import (
 )
 
 urlpatterns = [
+    path("", auth_views.LoginView.as_view(template_name="view/login.html")),
     path("home/", ProjectListView.as_view(), name="home"),
     path("perfil/", UserProfileView.as_view(), name="profile_edit"),
     path("usuarios/", UserListView.as_view(), name="user_list"),
