@@ -186,6 +186,11 @@ class InviteCollaboratorView(ProjectAccessMixin, LoginRequiredMixin, View):
         email = request.POST.get("email")
         project = get_object_or_404(Project, id=project_id)
 
+        # No permitir invitar al owner como colaborador
+        if email == project.owner.email:
+            messages.error(request, "Eres dueño del proyecto, no puedes invitarte como colaborador.")
+            return redirect("details_project", pk=project.id)
+
         if self._is_basic_account_limit_reached(request.user, project):
             messages.error(
                 request,
