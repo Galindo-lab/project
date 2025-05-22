@@ -181,7 +181,7 @@ def register(request):
     )
 
 
-class InviteCollaboratorView(ProjectAccessMixin, LoginRequiredMixin, View):
+class InviteCollaboratorView(LoginRequiredMixin, View):
     def post(self, request, project_id, *args, **kwargs):
         email = request.POST.get("email")
         project = get_object_or_404(Project, id=project_id)
